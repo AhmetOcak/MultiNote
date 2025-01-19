@@ -2,7 +2,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.compose.compiler)
-    kotlin("kapt")
+    alias(libs.plugins.hilt)
+    id("com.google.devtools.ksp")
 }
 
 android {
@@ -76,7 +77,7 @@ dependencies {
     // Dependency Injection
     implementation(libs.hilt.android)
     implementation(libs.androidx.hilt.navigation.compose)
-    kapt(libs.hilt.compiler)
+    ksp(libs.hilt.compiler)
 
     // ViewModel
     implementation(libs.androidx.lifecycle.viewmodel.compose)
@@ -86,11 +87,14 @@ dependencies {
 
     // Room
     implementation(libs.androidx.room.ktx)
-    kapt(libs.androidx.room.compiler)
+    ksp(libs.androidx.room.compiler)
 
     // Splash Api
     implementation(libs.androidx.core.splashscreen)
 
     // Datastore
     implementation(libs.androidx.datastore.preferences)
+
+    // Extended Material 3 Icons
+    implementation(libs.androidx.material.icons.extended)
 }
