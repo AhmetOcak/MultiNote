@@ -21,7 +21,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import coil.compose.rememberAsyncImagePainter
 import com.ahmetocak.multinote.R
+import java.io.File
 
 const val dummyDescription =
     "Lorem Ipsum is simply dummy text of the printing and typesetting industry. " +
@@ -51,7 +53,7 @@ fun TextNoteCard(title: String, description: String) {
 }
 
 @Composable
-fun ImageNoteCard(title: String, description: String, imageId: Int) {
+fun ImageNoteCard(title: String, description: String, imagePath: String?) {
     Card(modifier = Modifier.fillMaxWidth()) {
         Column(
             modifier = Modifier.padding(bottom = 16.dp),
@@ -59,7 +61,9 @@ fun ImageNoteCard(title: String, description: String, imageId: Int) {
         ) {
             Image(
                 modifier = Modifier.fillMaxWidth(),
-                painter = painterResource(imageId),
+                painter = if (imagePath == null) {
+                    painterResource(dummyImgId)
+                } else rememberAsyncImagePainter(File(imagePath)),
                 contentDescription = null,
                 contentScale = ContentScale.Crop
             )

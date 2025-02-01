@@ -37,9 +37,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.ahmetocak.multinote.core.ui.components.AudioNoteCard
+import com.ahmetocak.multinote.core.ui.components.ImageNoteCard
 import com.ahmetocak.multinote.core.ui.components.MNTopBar
 import com.ahmetocak.multinote.core.ui.components.SearchField
+import com.ahmetocak.multinote.core.ui.components.TextNoteCard
 import com.ahmetocak.multinote.model.Note
+import com.ahmetocak.multinote.model.NoteTag
+import com.ahmetocak.multinote.model.NoteType
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -100,7 +105,33 @@ fun HomeScreenContent(
                     contentPadding = PaddingValues(vertical = 16.dp)
                 ) {
                     items(noteList, key = { it.id }) {
+                        when (it.noteType) {
+                            NoteType.TEXT.ordinal -> {
+                                TextNoteCard(
+                                    title = it.title,
+                                    description = it.description
+                                )
+                            }
 
+                            NoteType.IMAGE.ordinal -> {
+                                ImageNoteCard(
+                                    title = it.title,
+                                    description = it.description,
+                                    imagePath = it.imagePath
+                                )
+                            }
+
+                            NoteType.AUDIO.ordinal -> {
+                                AudioNoteCard(
+                                    title = it.title,
+                                    description = it.description
+                                )
+                            }
+
+                            NoteType.VIDEO.ordinal -> {
+
+                            }
+                        }
                     }
                 }
             }
@@ -156,11 +187,58 @@ private fun FilterSheet(sheetState: SheetState) {
 }
 
 @Composable
-@Preview(showSystemUi = true)
+@Preview(showSystemUi = true, name = "EmptyList")
 private fun PreviewHomeScreenWithEmpty() {
     HomeScreenContent(
         searchQuery = "",
         noteList = emptyList(),
+        onOpenFiltersClick = {}
+    ) { }
+}
+
+@Composable
+@Preview(showSystemUi = true)
+private fun PreviewHomeScreen() {
+    HomeScreenContent(
+        searchQuery = "",
+        noteList = listOf(
+            Note(
+                id = 0,
+                title = "Test Title",
+                description = "AAewq ewqqwewq ewq weq wqe qw ewq eqwweq qwe",
+                noteType = NoteType.TEXT.ordinal,
+                tag = NoteTag.DAILY.ordinal,
+                imagePath = null,
+                audioPath = null
+            ),
+            Note(
+                id = 1,
+                title = "Test Title",
+                description = "AAewq ewqqwewq ewq weq wqe qw ewq eqwweq qwe",
+                noteType = NoteType.AUDIO.ordinal,
+                tag = NoteTag.DAILY.ordinal,
+                imagePath = null,
+                audioPath = null
+            ),
+            Note(
+                id = 2,
+                title = "Test Title",
+                description = "AAewq ewqqwewq ewq weq wqe qw ewq eqwweq qwe",
+                noteType = NoteType.VIDEO.ordinal,
+                tag = NoteTag.DAILY.ordinal,
+                imagePath = null,
+                audioPath = null
+            ),
+            Note(
+                id = 3,
+                title = "Test Title",
+                description = "AAewq ewqqwewq ewq weq wqe qw ewq eqwweq qwe",
+                noteType = NoteType.IMAGE.ordinal,
+                tag = NoteTag.DAILY.ordinal,
+                imagePath = null,
+                audioPath = null
+            )
+        ),
         onOpenFiltersClick = {}
     ) { }
 }
