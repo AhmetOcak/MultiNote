@@ -42,7 +42,10 @@ class HomeViewModel @Inject constructor(
             is HomeScreenUiEvent.OnQueryEntering -> searchQuery = event.query
 
             is HomeScreenUiEvent.OnSearchClick -> {
-
+                val filteredList = _uiState.value.noteList.filter { it.title.contains(searchQuery) }
+                _uiState.update {
+                    it.copy(noteList = filteredList)
+                }
             }
 
             is HomeScreenUiEvent.OnFilterListClick -> {
