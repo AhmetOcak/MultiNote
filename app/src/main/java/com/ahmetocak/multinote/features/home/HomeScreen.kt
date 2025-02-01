@@ -52,7 +52,7 @@ import kotlinx.coroutines.launch
 fun HomeScreen(viewModel: HomeViewModel = hiltViewModel()) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val onEvent by rememberUpdatedState(
-        newValue = { _: HomeScreenUiEvent -> viewModel::onEvent }
+        newValue = { event: HomeScreenUiEvent -> viewModel.onEvent(event) }
     )
     val sheetState = rememberModalBottomSheetState()
     val coroutineScope = rememberCoroutineScope()

@@ -9,6 +9,7 @@ fun NoteTag.toStringResource(context: Context): String {
         NoteTag.DAILY -> "Daily"
         NoteTag.BUSINESS -> "Business"
         NoteTag.EDUCATION -> "Education"
+        NoteTag.NONE -> "None"
     }
 }
 
