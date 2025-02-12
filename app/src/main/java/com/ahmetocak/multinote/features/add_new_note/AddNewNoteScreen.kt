@@ -1,7 +1,17 @@
 package com.ahmetocak.multinote.features.add_new_note
 
+import android.Manifest
+import android.net.Uri
+import android.os.Build
+import android.os.Environment
+import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -13,26 +23,39 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.AudioFile
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.VideoFile
 import androidx.compose.material.icons.filled.Videocam
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SheetState
+import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
@@ -41,27 +64,108 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.content.FileProvider
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil.compose.AsyncImage
 import com.ahmetocak.multinote.core.ui.components.MNTopBar
 import com.ahmetocak.multinote.features.add_new_note.components.MediaBottomSheet
 import com.ahmetocak.multinote.model.NoteTag
 import com.ahmetocak.multinote.model.NoteType
 import com.ahmetocak.multinote.utils.toStringResource
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberMultiplePermissionsState
+import com.google.accompanist.permissions.rememberPermissionState
+import kotlinx.coroutines.launch
+import java.io.File
 
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
 fun AddNewNoteScreen(
     modifier: Modifier = Modifier,
     viewModel: AddNewNoteViewModel = hiltViewModel()
 ) {
+    val cameraPermissionState = rememberMultiplePermissionsState(
+        permissions = if (Build.VERSION.SDK_INT > Build.VERSION_CODES.S_V2) {
+            listOf(Manifest.permission.CAMERA)
+        } else listOf(
+            Manifest.permission.CAMERA,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+        )
+    )
+
+    val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val onEvent by rememberUpdatedState(
         newValue = { event: AddNewNoteUiEvent -> viewModel.onEvent(event) }
+    )
+
+    val coroutineScope = rememberCoroutineScope()
+    val sheetState = rememberModalBottomSheetState()
+    var createdMediaFile by rememberSaveable { mutableStateOf<Uri?>(null) }
+
+    val createMediaFile: (String) -> Uri = {
+        val mediaFile = File(
+            context.getExternalFilesDir(Environment.DIRECTORY_PICTURES),
+            "photo_${System.currentTimeMillis()}.$it",
+        )
+        createdMediaFile =
+            FileProvider.getUriForFile(context, context.packageName + ".provider", mediaFile)
+        createdMediaFile!!
+    }
+
+    val imagePickerLauncher =
+        rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri: Uri? ->
+            Log.d("MultiNote App: picked image path -> ", uri?.path ?: "null")
+            coroutineScope.launch {
+                sheetState.hide()
+                uri?.let {
+                    viewModel.handleAction1Click(it)
+                }
+            }
+        }
+
+    val takePictureLauncher =
+        rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { success ->
+            Log.d("MultiNote App: Photo taken, result -> ", "$success")
+            coroutineScope.launch {
+                sheetState.hide()
+                createdMediaFile?.let {
+                    viewModel.handleAction1Click(it)
+                }
+                createdMediaFile = null
+            }
+        }
+
+    val captureVideoLauncher =
+        rememberLauncherForActivityResult(ActivityResultContracts.CaptureVideo()) { success ->
+            Log.d("MultiNote App: Photo taken, result -> ", "$success")
+            coroutineScope.launch {
+                sheetState.hide()
+                createdMediaFile?.let { viewModel.handleAction1Click(it) }
+                createdMediaFile = null
+            }
+        }
+
+    val audioPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        Log.d("MultiNote App: Audio file taken, result -> ", uri?.path ?: "null")
+        coroutineScope.launch {
+            sheetState.hide()
+            uri?.let { viewModel.handleAction1Click(it) }
+        }
+    }
+
+    val microphonePermissionState = rememberPermissionState(
+        permission = Manifest.permission.RECORD_AUDIO
     )
 
     AddNewNoteScreenContent(
@@ -70,12 +174,72 @@ fun AddNewNoteScreen(
         descriptionValue = uiState.descriptionValue,
         selectedNoteType = uiState.selectedNoteType,
         selectedNoteTag = uiState.selectedNoteTag,
-        showMediaBottomSheet = uiState.showMediaBottomSheet,
+        isSaveReady = uiState.isSaveReady,
+        sheetState = sheetState,
+        selectedImage = uiState.selectedImage,
+        selectedVideo = uiState.selectedVideo,
+        selectedAudio = uiState.selectedAudio,
         onEvent = onEvent,
-        onAddMediaClick = viewModel::handleAddMedia
+        onAddMediaClick = {
+            coroutineScope.launch {
+                sheetState.show()
+            }
+        },
+        action1Click = {
+            when (uiState.selectedNoteType) {
+                NoteType.IMAGE -> {
+                    imagePickerLauncher.launch(
+                        PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                    )
+                }
+
+                NoteType.AUDIO -> {
+                    audioPickerLauncher.launch("audio/*")
+                }
+
+                NoteType.VIDEO -> {
+                    imagePickerLauncher.launch(
+                        PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.VideoOnly)
+                    )
+                }
+
+                else -> {}
+            }
+        },
+        action2Click = {
+            when (uiState.selectedNoteType) {
+                NoteType.IMAGE -> {
+                    if (cameraPermissionState.allPermissionsGranted) {
+                        takePictureLauncher.launch(createMediaFile(".jpg"))
+                    } else {
+                        cameraPermissionState.launchMultiplePermissionRequest()
+                    }
+                }
+
+                NoteType.AUDIO -> {
+                    if (microphonePermissionState.status.isGranted) {
+                        // TODO: HANDLE AUDIO RECORD EVENTS
+                        viewModel.handleAction2Click()
+                    } else {
+                        microphonePermissionState.launchPermissionRequest()
+                    }
+                }
+
+                NoteType.VIDEO -> {
+                    if (cameraPermissionState.allPermissionsGranted) {
+                        captureVideoLauncher.launch(createMediaFile(".mp4"))
+                    } else {
+                        cameraPermissionState.launchMultiplePermissionRequest()
+                    }
+                }
+
+                else -> {}
+            }
+        }
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun AddNewNoteScreenContent(
     modifier: Modifier = Modifier,
@@ -83,14 +247,30 @@ private fun AddNewNoteScreenContent(
     descriptionValue: String,
     selectedNoteType: NoteType,
     selectedNoteTag: NoteTag,
-    showMediaBottomSheet: Boolean,
+    isSaveReady: Boolean,
+    sheetState: SheetState,
+    selectedImage: Uri?,
+    selectedVideo: Uri?,
+    selectedAudio: Uri?,
     onEvent: (AddNewNoteUiEvent) -> Unit,
-    onAddMediaClick: () -> Unit
+    onAddMediaClick: () -> Unit,
+    action1Click: () -> Unit,
+    action2Click: () -> Unit
 ) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
-            MNTopBar(title = "Create Note")
+            MNTopBar(
+                title = "Create Note",
+                navigationIcon = {
+                    IconButton(onClick = {}) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowBackIosNew,
+                            contentDescription = null
+                        )
+                    }
+                }
+            )
         }
     ) { innerPadding ->
         Column(
@@ -131,34 +311,89 @@ private fun AddNewNoteScreenContent(
             )
 
             AnimatedVisibility(selectedNoteType == NoteType.IMAGE) {
-                AddMediaContent(
-                    text = "Click for the add Image",
-                    icon = Icons.Default.Image,
-                    onClick = onAddMediaClick
-                )
+                Crossfade(targetState = selectedImage, label = "IMAGE") {
+                    when (it) {
+                        null -> {
+                            AddMediaContent(
+                                text = "Click for the add Image",
+                                icon = Icons.Default.Image,
+                                onClick = onAddMediaClick
+                            )
+                        }
+
+                        else -> {
+                            selectedImage?.let {
+                                AddMoreOrRemoveMedia(
+                                    text = "Click for the add Image",
+                                    uri = selectedImage
+                                )
+                            }
+                        }
+                    }
+                }
             }
             AnimatedVisibility(selectedNoteType == NoteType.AUDIO) {
-                AddMediaContent(
-                    text = "Click for the add audio",
-                    icon = Icons.Default.AudioFile,
-                    onClick = onAddMediaClick
-                )
+                Crossfade(targetState = selectedAudio, label = "VIDEO") {
+                    when (it) {
+                        null -> {
+                            AddMediaContent(
+                                text = "Click for the add audio",
+                                icon = Icons.Default.AudioFile,
+                                onClick = onAddMediaClick
+                            )
+                        }
+
+                        else -> {
+                            selectedAudio?.let {
+                                AddMoreOrRemoveMedia(
+                                    text = "Click for the add audio",
+                                    uri = selectedAudio
+                                )
+                            }
+                        }
+                    }
+                }
             }
             AnimatedVisibility(selectedNoteType == NoteType.VIDEO) {
-                AddMediaContent(
-                    text = "Click for the add video",
-                    icon = Icons.Default.VideoFile,
-                    onClick = onAddMediaClick
-                )
+                Crossfade(targetState = selectedVideo, label = "VIDEO") {
+                    when (it) {
+                        null -> {
+                            AddMediaContent(
+                                text = "Click for the add video",
+                                icon = Icons.Default.VideoFile,
+                                onClick = onAddMediaClick
+                            )
+                        }
+
+                        else -> {
+                            selectedVideo?.let {
+                                AddMoreOrRemoveMedia(
+                                    text = "Click for the add video",
+                                    uri = selectedVideo
+                                )
+                            }
+                        }
+                    }
+                }
             }
-            if (showMediaBottomSheet) {
+
+            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterEnd) {
+                Button(
+                    enabled = isSaveReady,
+                    onClick = { onEvent(AddNewNoteUiEvent.OnSaveNoteClick) }) {
+                    Text(text = "Save")
+                }
+            }
+
+            if (sheetState.currentValue == SheetValue.PartiallyExpanded || sheetState.currentValue == SheetValue.Expanded) {
                 when (selectedNoteType) {
                     NoteType.IMAGE -> {
                         MediaBottomSheet(
                             action1Image = Icons.Default.Image,
                             action2Image = Icons.Default.CameraAlt,
-                            action1OnClick = {},
-                            action2OnClick = {}
+                            sheetState = sheetState,
+                            action1OnClick = action1Click,
+                            action2OnClick = action2Click
                         )
                     }
 
@@ -166,8 +401,9 @@ private fun AddNewNoteScreenContent(
                         MediaBottomSheet(
                             action1Image = Icons.Default.AudioFile,
                             action2Image = Icons.Default.Mic,
-                            action1OnClick = {},
-                            action2OnClick = {}
+                            sheetState = sheetState,
+                            action1OnClick = action1Click,
+                            action2OnClick = action2Click
                         )
                     }
 
@@ -175,8 +411,9 @@ private fun AddNewNoteScreenContent(
                         MediaBottomSheet(
                             action1Image = Icons.Default.VideoFile,
                             action2Image = Icons.Default.Videocam,
-                            action1OnClick = {},
-                            action2OnClick = {}
+                            sheetState = sheetState,
+                            action1OnClick = action1Click,
+                            action2OnClick = action2Click
                         )
                     }
 
@@ -320,6 +557,26 @@ private fun AddMediaContent(text: String, icon: ImageVector, onClick: () -> Unit
     }
 }
 
+@Composable
+private fun AddMoreOrRemoveMedia(text: String, uri: Uri) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(144.dp),
+        shape = RoundedCornerShape(12.dp)
+    ) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            AsyncImage(
+                modifier = Modifier.fillMaxSize(),
+                model = uri,
+                contentDescription = null,
+                contentScale = ContentScale.FillBounds
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Preview(showSystemUi = true)
 @Composable
 private fun PreviewAddNewNoteScreen() {
@@ -330,6 +587,12 @@ private fun PreviewAddNewNoteScreen() {
         selectedNoteTag = NoteTag.NONE,
         onEvent = {},
         onAddMediaClick = {},
-        showMediaBottomSheet = false
+        isSaveReady = false,
+        selectedImage = null,
+        selectedAudio = null,
+        selectedVideo = null,
+        sheetState = rememberStandardBottomSheetState(),
+        action1Click = {},
+        action2Click = {}
     )
 }

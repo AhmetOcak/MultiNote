@@ -14,6 +14,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.SheetState
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -27,17 +28,16 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MediaBottomSheet(
     action1Image: ImageVector,
     action2Image: ImageVector,
+    sheetState: SheetState,
     action1OnClick: () -> Unit,
     action2OnClick: () -> Unit
 ) {
     val coroutineScope = rememberCoroutineScope()
-    val sheetState = rememberStandardBottomSheetState(initialValue = SheetValue.Expanded)
 
     ModalBottomSheet(
         onDismissRequest = {
@@ -51,7 +51,13 @@ fun MediaBottomSheet(
             modifier = Modifier.fillMaxWidth(),
             contentAlignment = Alignment.TopEnd
         ) {
-            TextButton(onClick = { coroutineScope.launch { sheetState.hide() } }) {
+            TextButton(
+                onClick = {
+                    coroutineScope.launch {
+                        sheetState.hide()
+                    }
+                }
+            ) {
                 Text(text = "cancel")
             }
         }
@@ -85,13 +91,15 @@ private fun Action(icon: ImageVector, onClick: () -> Unit) {
 }
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Preview(showSystemUi = true)
 @Composable
 private fun PreviewMediaBottomSheet() {
     MediaBottomSheet(
         action1Image = Icons.Default.Image,
         action2Image = Icons.Default.CameraAlt,
+        sheetState = rememberStandardBottomSheetState(initialValue = SheetValue.Expanded),
         action1OnClick = {},
-        action2OnClick = {}
+        action2OnClick = {},
     )
 }
