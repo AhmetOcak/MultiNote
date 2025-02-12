@@ -100,4 +100,7 @@ dependencies {
 
     // Coil Compose
     implementation(libs.coil.kt.coil.compose)
+
+    // Accompanist
+    implementation(libs.accompanist.permissions)
 }
