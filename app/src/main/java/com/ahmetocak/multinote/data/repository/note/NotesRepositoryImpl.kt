@@ -1,4 +1,4 @@
-package com.ahmetocak.multinote.data.repository
+package com.ahmetocak.multinote.data.repository.note
 
 import com.ahmetocak.multinote.data.datasource.local.NoteLocalDataSource
 import com.ahmetocak.multinote.model.Note

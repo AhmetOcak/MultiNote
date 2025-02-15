@@ -1,4 +1,4 @@
-package com.ahmetocak.multinote.ui.theme
+package com.ahmetocak.multinote.core.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

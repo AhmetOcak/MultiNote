@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">MultiNote</string>
+
+    <string name="settings">Settings</string>
+    <string name="dark_theme">Dark Theme</string>
+    <string name="color_themes">Themes</string>
+    <string name="dynamic_color">Dynamic Color</string>
+    <string name="rate_app">Rate App</string>
+    <string name="share_app">Share App</string>
+    <string name="themes">Themes</string>
 </resources>

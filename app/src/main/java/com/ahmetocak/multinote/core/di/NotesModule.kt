@@ -6,8 +6,8 @@ import com.ahmetocak.multinote.data.datasource.local.NoteLocalDataSource
 import com.ahmetocak.multinote.data.datasource.local.NoteLocalDataSourceImpl
 import com.ahmetocak.multinote.data.datasource.local.db.NotesDao
 import com.ahmetocak.multinote.data.datasource.local.db.NotesDatabase
-import com.ahmetocak.multinote.data.repository.NotesRepository
-import com.ahmetocak.multinote.data.repository.NotesRepositoryImpl
+import com.ahmetocak.multinote.data.repository.note.NotesRepository
+import com.ahmetocak.multinote.data.repository.note.NotesRepositoryImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
