@@ -11,14 +11,15 @@ import androidx.compose.ui.Modifier
 @Composable
 fun MNTopBar(
     modifier: Modifier = Modifier,
-    title: String,
+    title: String? = null,
     navigationIcon: @Composable () -> Unit = {},
     actions: @Composable (RowScope.() -> Unit) = {}
 ) {
     TopAppBar(
         modifier = modifier,
         title = {
-            Text(text = title)
+            if (title != null)
+                Text(text = title)
         },
         navigationIcon = navigationIcon,
         actions = actions
