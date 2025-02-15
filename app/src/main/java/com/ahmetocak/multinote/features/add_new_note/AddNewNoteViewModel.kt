@@ -3,17 +3,14 @@ package com.ahmetocak.multinote.features.add_new_note
 import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.ahmetocak.multinote.model.NoteTag
 import com.ahmetocak.multinote.model.NoteType
 import com.ahmetocak.multinote.utils.audio.recorder.AudioRecorder
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -42,6 +39,25 @@ class AddNewNoteViewModel @Inject constructor(
                 it.copy(descriptionValue = event.value)
             }
 
+            is AddNewNoteUiEvent.OnRecordAudioClick -> {
+                when (_uiState.value.audioRecordStatus) {
+                    is AudioRecordStatus.IDLE -> {
+                        _uiState.update {
+                            it.copy(audioRecordStatus = AudioRecordStatus.RECORDING)
+                        }
+                        audioRecorder.startRecording(1)
+                    }
+
+                    is AudioRecordStatus.RECORDING -> {
+                        _uiState.update {
+                            it.copy(audioRecordStatus = AudioRecordStatus.IDLE)
+                        }
+                        val recordedAudioFile = audioRecorder.stopRecording()
+                        Log.i("MN App: Recorded file path ", recordedAudioFile.path)
+                    }
+                }
+            }
+
             is AddNewNoteUiEvent.OnSaveNoteClick -> {}
         }
     }
@@ -63,29 +79,6 @@ class AddNewNoteViewModel @Inject constructor(
             else -> {}
         }
     }
-
-    fun handleAction2Click() {
-        when (_uiState.value.selectedNoteType) {
-            NoteType.IMAGE -> {
-                // TODO
-            }
-
-            NoteType.AUDIO -> {
-                viewModelScope.launch {
-                    audioRecorder.startRecording(1)
-                    delay(5000)
-                    val audioFile = audioRecorder.stopRecording()
-                    Log.i("MN App: recorded audio file uri: ", audioFile.path)
-                }
-            }
-
-            NoteType.VIDEO -> {
-                // TODO
-            }
-
-            else -> {}
-        }
-    }
 }
 
 data class AddNewNoteUiState(
@@ -96,7 +89,9 @@ data class AddNewNoteUiState(
     val isSaveReady: Boolean = false,
     val selectedImage: Uri? = null,
     val selectedVideo: Uri? = null,
-    val selectedAudio: Uri? = null
+    val selectedAudio: Uri? = null,
+    val hideSheet: Boolean = false,
+    val audioRecordStatus: AudioRecordStatus = AudioRecordStatus.IDLE
 )
 
 sealed class AddNewNoteUiEvent {
@@ -104,5 +99,16 @@ sealed class AddNewNoteUiEvent {
     data class OnTagSelect(val tag: NoteTag) : AddNewNoteUiEvent()
     data class OnTitleValueChange(val value: String) : AddNewNoteUiEvent()
     data class OnDescriptionValueChange(val value: String) : AddNewNoteUiEvent()
+    data object OnRecordAudioClick : AddNewNoteUiEvent()
     data object OnSaveNoteClick : AddNewNoteUiEvent()
+}
+
+sealed interface AudioRecordStatus {
+    data object RECORDING : AudioRecordStatus
+    data object IDLE : AudioRecordStatus
+}
+
+sealed interface AudioPlayStatus {
+    data object PLAYING : AudioPlayStatus
+    data object IDLE : AudioPlayStatus
 }

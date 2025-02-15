@@ -179,6 +179,7 @@ fun AddNewNoteScreen(
         selectedImage = uiState.selectedImage,
         selectedVideo = uiState.selectedVideo,
         selectedAudio = uiState.selectedAudio,
+        isAudioRecording = uiState.audioRecordStatus == AudioRecordStatus.RECORDING,
         onEvent = onEvent,
         onAddMediaClick = {
             coroutineScope.launch {
@@ -218,8 +219,10 @@ fun AddNewNoteScreen(
 
                 NoteType.AUDIO -> {
                     if (microphonePermissionState.status.isGranted) {
-                        // TODO: HANDLE AUDIO RECORD EVENTS
-                        viewModel.handleAction2Click()
+                        if (uiState.audioRecordStatus == AudioRecordStatus.RECORDING) {
+                            coroutineScope.launch { sheetState.hide() }
+                        }
+                        onEvent(AddNewNoteUiEvent.OnRecordAudioClick)
                     } else {
                         microphonePermissionState.launchPermissionRequest()
                     }
@@ -252,6 +255,7 @@ private fun AddNewNoteScreenContent(
     selectedImage: Uri?,
     selectedVideo: Uri?,
     selectedAudio: Uri?,
+    isAudioRecording: Boolean,
     onEvent: (AddNewNoteUiEvent) -> Unit,
     onAddMediaClick: () -> Unit,
     action1Click: () -> Unit,
@@ -402,6 +406,8 @@ private fun AddNewNoteScreenContent(
                             action1Image = Icons.Default.AudioFile,
                             action2Image = Icons.Default.Mic,
                             sheetState = sheetState,
+                            isAudioRecording = isAudioRecording,
+                            onSaveAudioClick = { onEvent(AddNewNoteUiEvent.OnRecordAudioClick) },
                             action1OnClick = action1Click,
                             action2OnClick = action2Click
                         )
@@ -591,6 +597,7 @@ private fun PreviewAddNewNoteScreen() {
         selectedImage = null,
         selectedAudio = null,
         selectedVideo = null,
+        isAudioRecording = false,
         sheetState = rememberStandardBottomSheetState(),
         action1Click = {},
         action2Click = {}
