@@ -47,9 +47,6 @@ fun SettingsScreen(
             TopAppBar(title = {
                 Text(text = stringResource(id = R.string.settings))
             })
-        },
-        bottomBar = {
-            // TODO: BOTTOM BAR
         }
     ) { paddingValues ->
         SettingsScreenContent(

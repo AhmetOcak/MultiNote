@@ -18,9 +18,6 @@ fun rememberAppNavController(
 @Stable
 class AppNavController(val navController: NavHostController) {
 
-    private val currentRoute: String?
-        get() = navController.currentDestination?.route
-
     fun upPress() {
         navController.navigateUp()
     }

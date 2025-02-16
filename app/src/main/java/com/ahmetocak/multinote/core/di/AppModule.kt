@@ -5,12 +5,15 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStoreFile
+import com.ahmetocak.multinote.data.repository.user_pref.UserPreferencesRepository
+import com.ahmetocak.multinote.data.repository.user_pref.UserPreferencesRepositoryImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Qualifier
+import javax.inject.Singleton
 
 @Qualifier
 @Retention(AnnotationRetention.RUNTIME)
@@ -30,5 +33,13 @@ object AppModule {
                 context.preferencesDataStoreFile("user_preferences_datastore")
             }
         )
+    }
+
+    @Provides
+    @Singleton
+    fun provideUserPrefRepository(
+        @DatastorePreferences(AppPreferences.USER_PREF) dataStore: DataStore<Preferences>
+    ): UserPreferencesRepository {
+        return UserPreferencesRepositoryImpl(dataStore)
     }
 }

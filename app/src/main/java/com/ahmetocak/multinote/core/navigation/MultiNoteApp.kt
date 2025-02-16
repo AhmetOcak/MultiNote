@@ -51,30 +51,25 @@ private fun NavGraphBuilder.navGraph(
     isDynamicColorChecked: Boolean,
     currentScheme: CustomColorScheme
 ) {
-    navigation(
-        route = Destinations.HOME_ROUTE,
-        startDestination =Destinations.NOTE_ROUTE
+    composable(route = Destinations.HOME_ROUTE) {
+        HomeScreen()
+    }
+    composable(route = Destinations.SETTINGS_ROUTE) {
+        SettingsScreen(
+            isDarkThemeChecked = isDarkThemeChecked,
+            isDynamicColorChecked = isDynamicColorChecked,
+            currentScheme = currentScheme
+        )
+    }
+    composable(route = Destinations.CREATE_NOTE_ROUTE) {
+        AddNewNoteScreen()
+    }
+    composable(
+        route = "${Destinations.NOTE_ROUTE}/{${Arguments.NOTE_ID}}",
+        arguments = listOf(
+            navArgument(Arguments.NOTE_ID) { NavType.IntType }
+        )
     ) {
-        composable(route = Destinations.HOME_ROUTE) {
-            HomeScreen()
-        }
-        composable(route = Destinations.SETTINGS_ROUTE) {
-            SettingsScreen(
-                isDarkThemeChecked = isDarkThemeChecked,
-                isDynamicColorChecked = isDynamicColorChecked,
-                currentScheme = currentScheme
-            )
-        }
-        composable(route = Destinations.CREATE_NOTE_ROUTE) {
-            AddNewNoteScreen()
-        }
-        composable(
-            route = "${Destinations.NOTE_ROUTE}/${Arguments.NOTE_ID}",
-            arguments = listOf(
-                navArgument(Arguments.NOTE_ID) { NavType.IntType }
-            )
-        ) {
-            NoteScreen()
-        }
+        NoteScreen()
     }
 }
