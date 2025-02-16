@@ -1,4 +1,4 @@
-package com.ahmetocak.multinote
+package com.ahmetocak.multinote.features
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf

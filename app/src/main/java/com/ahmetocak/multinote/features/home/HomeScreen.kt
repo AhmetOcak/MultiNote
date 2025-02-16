@@ -49,7 +49,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(viewModel: HomeViewModel = hiltViewModel()) {
+fun HomeScreen(modifier: Modifier = Modifier, viewModel: HomeViewModel = hiltViewModel()) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val onEvent by rememberUpdatedState(
         newValue = { event: HomeScreenUiEvent -> viewModel.onEvent(event) }
@@ -58,6 +58,7 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel()) {
     val coroutineScope = rememberCoroutineScope()
 
     HomeScreenContent(
+        modifier = modifier,
         searchQuery = viewModel.searchQuery,
         noteList = uiState.noteList,
         onOpenFiltersClick = {
@@ -71,13 +72,14 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel()) {
 
 @Composable
 fun HomeScreenContent(
+    modifier: Modifier = Modifier,
     searchQuery: String,
     noteList: List<Note>,
     onOpenFiltersClick: () -> Unit,
     onEvent: (HomeScreenUiEvent) -> Unit
 ) {
     Scaffold(
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
         topBar = {
             MNTopBar(title = "MultiNote")
         }

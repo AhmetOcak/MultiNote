@@ -34,7 +34,6 @@ private const val APP_URL = ""
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
-    onNavigateToRoute: (String) -> Unit,
     isDarkThemeChecked: Boolean,
     isDynamicColorChecked: Boolean,
     currentScheme: CustomColorScheme,

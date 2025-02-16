@@ -1,4 +1,4 @@
-package com.ahmetocak.multinote
+package com.ahmetocak.multinote.features
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -8,8 +8,7 @@ import androidx.activity.viewModels
 import androidx.compose.runtime.getValue
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.ahmetocak.multinote.features.add_new_note.AddNewNoteScreen
-import com.ahmetocak.multinote.core.ui.theme.MultiNoteTheme
+import com.ahmetocak.multinote.core.navigation.MultiNoteApp
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -27,13 +26,11 @@ class MainActivity : ComponentActivity() {
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
             if (viewModel.isPreferencesReady) {
-                MultiNoteTheme(
-                    customColorScheme = uiState.colorScheme,
-                    dynamicColor = uiState.isDynamicColor,
-                    darkTheme = uiState.isDarkTheme
-                ) {
-                    AddNewNoteScreen()
-                }
+                MultiNoteApp(
+                    isDarkThemeChecked = uiState.isDarkTheme,
+                    isDynamicColorChecked = uiState.isDynamicColor,
+                    currentScheme = uiState.colorScheme
+                )
             }
         }
     }
