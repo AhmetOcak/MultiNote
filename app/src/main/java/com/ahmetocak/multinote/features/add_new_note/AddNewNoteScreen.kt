@@ -90,6 +90,7 @@ import java.io.File
 @Composable
 fun AddNewNoteScreen(
     modifier: Modifier = Modifier,
+    onNavigateUpClick: () -> Unit,
     viewModel: AddNewNoteViewModel = hiltViewModel()
 ) {
     val cameraPermissionState = rememberMultiplePermissionsState(
@@ -174,7 +175,7 @@ fun AddNewNoteScreen(
         descriptionValue = uiState.descriptionValue,
         selectedNoteType = uiState.selectedNoteType,
         selectedNoteTag = uiState.selectedNoteTag,
-        isSaveReady = uiState.isSaveReady,
+        isSaveReady = viewModel.isSaveReady(),
         sheetState = sheetState,
         selectedImage = uiState.selectedImage,
         selectedVideo = uiState.selectedVideo,
@@ -238,7 +239,8 @@ fun AddNewNoteScreen(
 
                 else -> {}
             }
-        }
+        },
+        onNavigateUpClick = onNavigateUpClick
     )
 }
 
@@ -259,7 +261,8 @@ private fun AddNewNoteScreenContent(
     onEvent: (AddNewNoteUiEvent) -> Unit,
     onAddMediaClick: () -> Unit,
     action1Click: () -> Unit,
-    action2Click: () -> Unit
+    action2Click: () -> Unit,
+    onNavigateUpClick: () -> Unit
 ) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -267,7 +270,7 @@ private fun AddNewNoteScreenContent(
             MNTopBar(
                 title = "Create Note",
                 navigationIcon = {
-                    IconButton(onClick = {}) {
+                    IconButton(onClick = onNavigateUpClick) {
                         Icon(
                             imageVector = Icons.Default.ArrowBackIosNew,
                             contentDescription = null
@@ -600,6 +603,7 @@ private fun PreviewAddNewNoteScreen() {
         isAudioRecording = false,
         sheetState = rememberStandardBottomSheetState(),
         action1Click = {},
-        action2Click = {}
+        action2Click = {},
+        onNavigateUpClick = {}
     )
 }

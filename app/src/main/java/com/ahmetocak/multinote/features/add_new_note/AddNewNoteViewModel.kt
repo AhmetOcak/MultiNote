@@ -24,7 +24,12 @@ class AddNewNoteViewModel @Inject constructor(
     fun onEvent(event: AddNewNoteUiEvent) {
         when (event) {
             is AddNewNoteUiEvent.OnTypeSelect -> _uiState.update {
-                it.copy(selectedNoteType = event.type)
+                it.copy(
+                    selectedNoteType = event.type,
+                    selectedVideo = null,
+                    selectedImage = null,
+                    selectedAudio = null
+                )
             }
 
             is AddNewNoteUiEvent.OnTagSelect -> _uiState.update {
@@ -79,6 +84,17 @@ class AddNewNoteViewModel @Inject constructor(
             else -> {}
         }
     }
+
+    fun isSaveReady(): Boolean {
+        val state = _uiState.value
+        val isMandatoryFieldsFill = state.titleValue.isNotEmpty() && state.descriptionValue.isNotEmpty()
+        return when (state.selectedNoteType) {
+            NoteType.TEXT -> isMandatoryFieldsFill
+            NoteType.IMAGE -> isMandatoryFieldsFill && state.selectedImage != null
+            NoteType.AUDIO -> isMandatoryFieldsFill && state.selectedAudio != null
+            NoteType.VIDEO -> isMandatoryFieldsFill && state.selectedVideo != null
+        }
+    }
 }
 
 data class AddNewNoteUiState(
@@ -86,7 +102,6 @@ data class AddNewNoteUiState(
     val selectedNoteTag: NoteTag = NoteTag.NONE,
     val titleValue: String = "",
     val descriptionValue: String = "",
-    val isSaveReady: Boolean = false,
     val selectedImage: Uri? = null,
     val selectedVideo: Uri? = null,
     val selectedAudio: Uri? = null,

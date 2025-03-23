@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -39,7 +40,9 @@ fun MultiNoteApp(
                 navGraph(
                     isDarkThemeChecked = isDarkThemeChecked,
                     isDynamicColorChecked = isDynamicColorChecked,
-                    currentScheme = currentScheme
+                    currentScheme = currentScheme,
+                    onCreateNoteClick = appNavController::navigateCreateNote,
+                    onNavigateUpClick = appNavController::upPress
                 )
             }
         }
@@ -49,10 +52,12 @@ fun MultiNoteApp(
 private fun NavGraphBuilder.navGraph(
     isDarkThemeChecked: Boolean,
     isDynamicColorChecked: Boolean,
-    currentScheme: CustomColorScheme
+    currentScheme: CustomColorScheme,
+    onCreateNoteClick: (NavBackStackEntry) -> Unit,
+    onNavigateUpClick: () -> Unit
 ) {
     composable(route = Destinations.HOME_ROUTE) {
-        HomeScreen()
+        HomeScreen(onCreateNoteClick = { onCreateNoteClick(it) })
     }
     composable(route = Destinations.SETTINGS_ROUTE) {
         SettingsScreen(
@@ -62,7 +67,7 @@ private fun NavGraphBuilder.navGraph(
         )
     }
     composable(route = Destinations.CREATE_NOTE_ROUTE) {
-        AddNewNoteScreen()
+        AddNewNoteScreen(onNavigateUpClick = onNavigateUpClick)
     }
     composable(
         route = "${Destinations.NOTE_ROUTE}/{${Arguments.NOTE_ID}}",

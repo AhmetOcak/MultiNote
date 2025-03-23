@@ -1,6 +1,8 @@
 package com.ahmetocak.multinote.features.home
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -15,10 +17,13 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
+import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ContentPasteSearch
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -45,11 +50,16 @@ import com.ahmetocak.multinote.core.ui.components.TextNoteCard
 import com.ahmetocak.multinote.model.Note
 import com.ahmetocak.multinote.model.NoteTag
 import com.ahmetocak.multinote.model.NoteType
+import com.ahmetocak.multinote.utils.isScrollingUp
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(modifier: Modifier = Modifier, viewModel: HomeViewModel = hiltViewModel()) {
+fun HomeScreen(
+    modifier: Modifier = Modifier,
+    onCreateNoteClick: () -> Unit,
+    viewModel: HomeViewModel = hiltViewModel()
+) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val onEvent by rememberUpdatedState(
         newValue = { event: HomeScreenUiEvent -> viewModel.onEvent(event) }
@@ -66,6 +76,7 @@ fun HomeScreen(modifier: Modifier = Modifier, viewModel: HomeViewModel = hiltVie
                 sheetState.show()
             }
         },
+        onCreateNoteClick = onCreateNoteClick,
         onEvent = { onEvent(it) }
     )
 }
@@ -76,12 +87,30 @@ fun HomeScreenContent(
     searchQuery: String,
     noteList: List<Note>,
     onOpenFiltersClick: () -> Unit,
+    onCreateNoteClick: () -> Unit,
     onEvent: (HomeScreenUiEvent) -> Unit
 ) {
+    val listState = rememberLazyStaggeredGridState()
+
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
             MNTopBar(title = "MultiNote")
+        },
+        floatingActionButton = {
+            AnimatedVisibility(
+                visible = listState.isScrollingUp().value,
+                enter = scaleIn(),
+                exit = scaleOut()
+
+            ) {
+                FloatingActionButton(onClick = onCreateNoteClick) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = null
+                    )
+                }
+            }
         }
     ) { innerPadding ->
         Column(
@@ -101,6 +130,7 @@ fun HomeScreenContent(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(horizontal = 16.dp),
+                    state = listState,
                     columns = StaggeredGridCells.Fixed(2),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalItemSpacing = 8.dp,
@@ -194,7 +224,8 @@ private fun PreviewHomeScreenWithEmpty() {
     HomeScreenContent(
         searchQuery = "",
         noteList = emptyList(),
-        onOpenFiltersClick = {}
+        onOpenFiltersClick = {},
+        onCreateNoteClick = {}
     ) { }
 }
 
@@ -241,6 +272,7 @@ private fun PreviewHomeScreen() {
                 audioPath = null
             )
         ),
-        onOpenFiltersClick = {}
+        onOpenFiltersClick = {},
+        onCreateNoteClick = {}
     ) { }
 }
