@@ -26,5 +26,8 @@ data class Note(
     val imagePath: String?,
 
     @ColumnInfo(name = "audio_path")
-    val audioPath: String?
+    val audioPath: String?,
+
+    @ColumnInfo(name = "video_path")
+    val videoPath: String?
 )

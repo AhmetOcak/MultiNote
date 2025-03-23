@@ -3,19 +3,25 @@ package com.ahmetocak.multinote.features.add_new_note
 import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.ahmetocak.multinote.data.repository.note.NotesRepository
+import com.ahmetocak.multinote.model.Note
 import com.ahmetocak.multinote.model.NoteTag
 import com.ahmetocak.multinote.model.NoteType
 import com.ahmetocak.multinote.utils.audio.recorder.AudioRecorder
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class AddNewNoteViewModel @Inject constructor(
-    private val audioRecorder: AudioRecorder
+    private val audioRecorder: AudioRecorder,
+    private val notesRepository: NotesRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AddNewNoteUiState())
@@ -63,7 +69,7 @@ class AddNewNoteViewModel @Inject constructor(
                 }
             }
 
-            is AddNewNoteUiEvent.OnSaveNoteClick -> {}
+            is AddNewNoteUiEvent.OnSaveNoteClick -> addNote()
         }
     }
 
@@ -93,6 +99,42 @@ class AddNewNoteViewModel @Inject constructor(
             NoteType.IMAGE -> isMandatoryFieldsFill && state.selectedImage != null
             NoteType.AUDIO -> isMandatoryFieldsFill && state.selectedAudio != null
             NoteType.VIDEO -> isMandatoryFieldsFill && state.selectedVideo != null
+        }
+    }
+
+    private fun addNote() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val state = _uiState.value
+            try {
+                notesRepository.addNote(
+                    note = Note(
+                        title = state.titleValue,
+                        description = state.titleValue,
+                        tag = state.selectedNoteTag.ordinal,
+                        noteType = state.selectedNoteType.ordinal,
+                        audioPath = state.selectedAudio?.path,
+                        imagePath = state.selectedImage?.path,
+                        videoPath = state.selectedVideo?.path
+                    )
+                )
+                resetAllData()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    private fun resetAllData() {
+        _uiState.update {
+            it.copy(
+                selectedNoteType = NoteType.TEXT,
+                selectedNoteTag = NoteTag.NONE,
+                titleValue = "",
+                descriptionValue = "",
+                selectedImage = null,
+                selectedVideo = null,
+                selectedAudio = null
+            )
         }
     }
 }

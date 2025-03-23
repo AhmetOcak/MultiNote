@@ -242,7 +242,8 @@ private fun PreviewHomeScreen() {
                 noteType = NoteType.TEXT.ordinal,
                 tag = NoteTag.DAILY.ordinal,
                 imagePath = null,
-                audioPath = null
+                audioPath = null,
+                videoPath = null
             ),
             Note(
                 id = 1,
@@ -251,7 +252,8 @@ private fun PreviewHomeScreen() {
                 noteType = NoteType.AUDIO.ordinal,
                 tag = NoteTag.DAILY.ordinal,
                 imagePath = null,
-                audioPath = null
+                audioPath = null,
+                videoPath = null
             ),
             Note(
                 id = 2,
@@ -260,7 +262,8 @@ private fun PreviewHomeScreen() {
                 noteType = NoteType.VIDEO.ordinal,
                 tag = NoteTag.DAILY.ordinal,
                 imagePath = null,
-                audioPath = null
+                audioPath = null,
+                videoPath = null
             ),
             Note(
                 id = 3,
@@ -269,7 +272,8 @@ private fun PreviewHomeScreen() {
                 noteType = NoteType.IMAGE.ordinal,
                 tag = NoteTag.DAILY.ordinal,
                 imagePath = null,
-                audioPath = null
+                audioPath = null,
+                videoPath = null
             )
         ),
         onOpenFiltersClick = {},
