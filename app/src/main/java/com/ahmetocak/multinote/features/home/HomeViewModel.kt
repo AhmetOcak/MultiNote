@@ -26,6 +26,8 @@ class HomeViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(HomeScreenUiState())
     val uiState: StateFlow<HomeScreenUiState> = _uiState.asStateFlow()
 
+    var originalNoteList = emptyList<Note>()
+
     var searchQuery by mutableStateOf("")
         private set
 
@@ -48,8 +50,41 @@ class HomeViewModel @Inject constructor(
                 }
             }
 
-            is HomeScreenUiEvent.OnFilterListClick -> {
+            is HomeScreenUiEvent.OnShowFilterSheetClick -> _uiState.update {
+                it.copy(showFilterSheet = true)
+            }
 
+            is HomeScreenUiEvent.OnCloseFilterSheetClick -> _uiState.update {
+                it.copy(showFilterSheet = false, filterList = emptyList())
+            }
+
+            is HomeScreenUiEvent.OnSubmitFilterClick -> {
+                if (_uiState.value.filterList.isEmpty()) {
+                    _uiState.update {
+                        it.copy(showFilterSheet = false, noteList = originalNoteList)
+                    }
+                } else {
+                    _uiState.update {
+                        it.copy(
+                            showFilterSheet = false,
+                            noteList = originalNoteList.filter { note ->
+                                _uiState.value.filterList.any { filter -> filter == note.tag }
+                            }
+                        )
+                    }
+                }
+            }
+
+            is HomeScreenUiEvent.OnFilterAction -> {
+                val currentList = _uiState.value.filterList.toMutableList()
+                if (currentList.contains(event.filterOrd)) {
+                    currentList.remove(event.filterOrd)
+                } else {
+                    currentList.add(event.filterOrd)
+                }
+                _uiState.update {
+                    it.copy(filterList = currentList)
+                }
             }
         }
     }
@@ -65,12 +100,15 @@ class HomeViewModel @Inject constructor(
                     _uiState.update {
                         it.copy(screenState = HomeScreenState.Idle, noteList = noteList)
                     }
+                    originalNoteList = noteList
                 }
         }
     }
 }
 
 data class HomeScreenUiState(
+    val showFilterSheet: Boolean = false,
+    val filterList: List<Int> = emptyList(),
     val noteList: List<Note> = emptyList(),
     val screenState: HomeScreenState = HomeScreenState.Loading
 )
@@ -78,12 +116,14 @@ data class HomeScreenUiState(
 sealed interface HomeScreenState {
     data object Loading : HomeScreenState
     data object Idle : HomeScreenState
-    data object Filter : HomeScreenState
 }
 
 sealed class HomeScreenUiEvent {
     data class OnNoteClick(val id: Inject) : HomeScreenUiEvent()
     data class OnQueryEntering(val query: String) : HomeScreenUiEvent()
     data object OnSearchClick : HomeScreenUiEvent()
-    data object OnFilterListClick : HomeScreenUiEvent()
+    data object OnSubmitFilterClick : HomeScreenUiEvent()
+    data object OnShowFilterSheetClick : HomeScreenUiEvent()
+    data object OnCloseFilterSheetClick : HomeScreenUiEvent()
+    data class OnFilterAction(val filterOrd: Int) : HomeScreenUiEvent()
 }

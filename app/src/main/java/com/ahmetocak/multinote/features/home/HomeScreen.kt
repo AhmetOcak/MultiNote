@@ -21,6 +21,7 @@ import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridS
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ContentPasteSearch
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.FloatingActionButton
@@ -28,12 +29,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -51,9 +49,8 @@ import com.ahmetocak.multinote.model.Note
 import com.ahmetocak.multinote.model.NoteTag
 import com.ahmetocak.multinote.model.NoteType
 import com.ahmetocak.multinote.utils.isScrollingUp
-import kotlinx.coroutines.launch
+import com.ahmetocak.multinote.utils.toPublicName
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
@@ -64,21 +61,19 @@ fun HomeScreen(
     val onEvent by rememberUpdatedState(
         newValue = { event: HomeScreenUiEvent -> viewModel.onEvent(event) }
     )
-    val sheetState = rememberModalBottomSheetState()
-    val coroutineScope = rememberCoroutineScope()
 
     HomeScreenContent(
         modifier = modifier,
         searchQuery = viewModel.searchQuery,
         noteList = uiState.noteList,
-        onOpenFiltersClick = {
-            coroutineScope.launch {
-                sheetState.show()
-            }
-        },
+        onOpenFiltersClick = { onEvent(HomeScreenUiEvent.OnShowFilterSheetClick) },
         onCreateNoteClick = onCreateNoteClick,
         onEvent = { onEvent(it) }
     )
+
+    if (uiState.showFilterSheet) {
+        FilterSheet(onEvent = onEvent, filterList = uiState.filterList)
+    }
 }
 
 @Composable
@@ -188,11 +183,10 @@ fun HomeScreenContent(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun FilterSheet(sheetState: SheetState) {
+private fun FilterSheet(filterList: List<Int>, onEvent: (HomeScreenUiEvent) -> Unit) {
     ModalBottomSheet(
         modifier = Modifier.fillMaxSize(),
-        sheetState = sheetState,
-        onDismissRequest = {},
+        onDismissRequest = { onEvent(HomeScreenUiEvent.OnCloseFilterSheetClick) },
     ) {
         Column(
             modifier = Modifier.padding(16.dp),
@@ -202,19 +196,39 @@ private fun FilterSheet(sheetState: SheetState) {
                 text = "Filter the note list",
                 style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold)
             )
-            /*
-            TODO: Filter list
-             */
+            NoteTag.entries.toTypedArray().forEach { tag ->
+                FilterItem(
+                    filterName = tag.toPublicName(),
+                    isChecked = filterList.contains(tag.ordinal),
+                    onCheckedChange = { onEvent(HomeScreenUiEvent.OnFilterAction(tag.ordinal)) }
+                )
+            }
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-                FilledTonalButton(onClick = {}) {
+                FilledTonalButton(onClick = { onEvent(HomeScreenUiEvent.OnCloseFilterSheetClick) }) {
                     Text(text = "Cancel")
                 }
                 Spacer(modifier = Modifier.width(8.dp))
-                FilledTonalButton(onClick = {}) {
+                FilledTonalButton(onClick = { onEvent(HomeScreenUiEvent.OnSubmitFilterClick) }) {
                     Text(text = "Filter")
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun FilterItem(
+    isChecked: Boolean,
+    filterName: String,
+    onCheckedChange: (Boolean) -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        Checkbox(checked = isChecked, onCheckedChange = onCheckedChange)
+        Text(text = filterName)
     }
 }
 
