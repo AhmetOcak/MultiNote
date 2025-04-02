@@ -26,7 +26,7 @@ class HomeViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(HomeScreenUiState())
     val uiState: StateFlow<HomeScreenUiState> = _uiState.asStateFlow()
 
-    var originalNoteList = emptyList<Note>()
+    private var originalNoteList = emptyList<Note>()
 
     var searchQuery by mutableStateOf("")
         private set
@@ -41,14 +41,12 @@ class HomeViewModel @Inject constructor(
 
             }
 
-            is HomeScreenUiEvent.OnQueryEntering -> searchQuery = event.query
-
-            is HomeScreenUiEvent.OnSearchClick -> {
-                val filteredList = _uiState.value.noteList.filter { it.title.contains(searchQuery) }
-                _uiState.update {
-                    it.copy(noteList = filteredList)
-                }
+            is HomeScreenUiEvent.OnQueryEntering -> {
+                searchQuery = event.query
+                filterListByQuery()
             }
+
+            is HomeScreenUiEvent.OnSearchClick -> filterListByQuery()
 
             is HomeScreenUiEvent.OnShowFilterSheetClick -> _uiState.update {
                 it.copy(showFilterSheet = true)
@@ -102,6 +100,13 @@ class HomeViewModel @Inject constructor(
                     }
                     originalNoteList = noteList
                 }
+        }
+    }
+
+    private fun filterListByQuery() {
+        val filteredList = originalNoteList.filter { it.title.contains(searchQuery) }
+        _uiState.update {
+            it.copy(noteList = if (searchQuery.isEmpty()) originalNoteList else filteredList)
         }
     }
 }
