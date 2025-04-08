@@ -114,9 +114,9 @@ class AddNewNoteViewModel @Inject constructor(
                         description = state.titleValue,
                         tag = state.selectedNoteTag.ordinal,
                         noteType = state.selectedNoteType.ordinal,
-                        audioPath = state.selectedAudio?.path,
-                        imagePath = state.selectedImage?.path,
-                        videoPath = state.selectedVideo?.path
+                        audioPath = emptyList(),
+                        imagePath = emptyList(),
+                        videoPath = emptyList()
                     )
                 )
 

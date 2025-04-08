@@ -23,11 +23,11 @@ data class Note(
     val tag: Int,
 
     @ColumnInfo(name = "image_path")
-    val imagePath: String?,
+    val imagePath: List<String>?,
 
     @ColumnInfo(name = "audio_path")
-    val audioPath: String?,
+    val audioPath: List<String>?,
 
     @ColumnInfo(name = "video_path")
-    val videoPath: String?
+    val videoPath: List<String>?
 )

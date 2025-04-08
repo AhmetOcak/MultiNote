@@ -103,4 +103,7 @@ dependencies {
 
     // Accompanist
     implementation(libs.accompanist.permissions)
+
+    // Gson
+    implementation(libs.gson)
 }
