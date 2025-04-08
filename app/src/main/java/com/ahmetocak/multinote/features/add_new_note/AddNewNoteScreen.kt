@@ -27,7 +27,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.AudioFile
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Image
@@ -39,7 +38,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
@@ -212,7 +210,7 @@ fun AddNewNoteScreen(
             when (uiState.selectedNoteType) {
                 NoteType.IMAGE -> {
                     if (cameraPermissionState.allPermissionsGranted) {
-                        takePictureLauncher.launch(createMediaFile(".jpg"))
+                        takePictureLauncher.launch(createMediaFile("jpg"))
                     } else {
                         cameraPermissionState.launchMultiplePermissionRequest()
                     }
@@ -269,14 +267,7 @@ private fun AddNewNoteScreenContent(
         topBar = {
             MNTopBar(
                 title = "Create Note",
-                navigationIcon = {
-                    IconButton(onClick = onNavigateUpClick) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowBackIosNew,
-                            contentDescription = null
-                        )
-                    }
-                }
+                onNavigateBack = onNavigateUpClick
             )
         }
     ) { innerPadding ->
@@ -541,9 +532,8 @@ private fun AddMediaContent(text: String, icon: ImageVector, onClick: () -> Unit
                 drawRoundRect(
                     color = Color.Black,
                     style = Stroke(
-                        width = 2f, pathEffect = PathEffect.dashPathEffect(
-                            floatArrayOf(10f, 10f), 0f
-                        )
+                        width = 2f,
+                        pathEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 10f), 0f)
                     ),
                     cornerRadius = CornerRadius(12.dp.toPx())
                 )

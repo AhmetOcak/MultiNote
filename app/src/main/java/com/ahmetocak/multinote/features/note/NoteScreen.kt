@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -30,23 +29,20 @@ import com.ahmetocak.multinote.core.ui.components.dummyDescription
 @Composable
 fun NoteScreen(
     modifier: Modifier = Modifier,
+    onNavigateBack: () -> Unit,
     viewModel: NoteViewModel = hiltViewModel()
 ) {
 
-    NoteScreenContent(modifier = modifier)
+    NoteScreenContent(modifier = modifier, onNavigateBack = onNavigateBack)
 }
 
 @Composable
-private fun NoteScreenContent(modifier: Modifier = Modifier) {
+private fun NoteScreenContent(modifier: Modifier = Modifier, onNavigateBack: () -> Unit) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
             MNTopBar(
-                navigationIcon = {
-                    IconButton(onClick = {/*TODO: NAVIGATE BACK*/ }) {
-                        Icon(imageVector = Icons.Default.ArrowBackIosNew, contentDescription = null)
-                    }
-                },
+                onNavigateBack = onNavigateBack,
                 actions = {
                     IconButton(onClick = {/*TODO: OPEN ACTIONS*/ }) {
                         Icon(imageVector = Icons.Default.Menu, contentDescription = null)
@@ -82,5 +78,5 @@ private fun NoteScreenContent(modifier: Modifier = Modifier) {
 @Composable
 @Preview
 private fun PreviewNoteScreenContent() {
-    NoteScreenContent()
+    NoteScreenContent(onNavigateBack = {})
 }

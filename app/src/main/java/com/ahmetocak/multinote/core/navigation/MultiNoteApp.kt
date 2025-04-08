@@ -10,7 +10,6 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import androidx.navigation.navigation
 import com.ahmetocak.multinote.core.ui.theme.MultiNoteTheme
 import com.ahmetocak.multinote.core.ui.theme.color_schemes.CustomColorScheme
 import com.ahmetocak.multinote.features.add_new_note.AddNewNoteScreen
@@ -42,6 +41,7 @@ fun MultiNoteApp(
                     isDynamicColorChecked = isDynamicColorChecked,
                     currentScheme = currentScheme,
                     onCreateNoteClick = appNavController::navigateCreateNote,
+                    onSettingsClick = appNavController::navigateSettings,
                     onNavigateUpClick = appNavController::upPress
                 )
             }
@@ -54,15 +54,20 @@ private fun NavGraphBuilder.navGraph(
     isDynamicColorChecked: Boolean,
     currentScheme: CustomColorScheme,
     onCreateNoteClick: (NavBackStackEntry) -> Unit,
+    onSettingsClick: (NavBackStackEntry) -> Unit,
     onNavigateUpClick: () -> Unit
 ) {
     composable(route = Destinations.HOME_ROUTE) {
-        HomeScreen(onCreateNoteClick = { onCreateNoteClick(it) })
+        HomeScreen(
+            onCreateNoteClick = { onCreateNoteClick(it) },
+            onSettingsClick = { onSettingsClick(it) }
+        )
     }
     composable(route = Destinations.SETTINGS_ROUTE) {
         SettingsScreen(
             isDarkThemeChecked = isDarkThemeChecked,
             isDynamicColorChecked = isDynamicColorChecked,
+            onNavigateBack = onNavigateUpClick,
             currentScheme = currentScheme
         )
     }
@@ -75,6 +80,6 @@ private fun NavGraphBuilder.navGraph(
             navArgument(Arguments.NOTE_ID) { NavType.IntType }
         )
     ) {
-        NoteScreen()
+        NoteScreen(onNavigateBack = onNavigateUpClick)
     }
 }

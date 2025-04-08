@@ -21,11 +21,13 @@ import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridS
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ContentPasteSearch
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
@@ -55,6 +57,7 @@ import com.ahmetocak.multinote.utils.toPublicName
 fun HomeScreen(
     modifier: Modifier = Modifier,
     onCreateNoteClick: () -> Unit,
+    onSettingsClick: () -> Unit,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -66,8 +69,8 @@ fun HomeScreen(
         modifier = modifier,
         searchQuery = viewModel.searchQuery,
         noteList = uiState.noteList,
-        onOpenFiltersClick = { onEvent(HomeScreenUiEvent.OnShowFilterSheetClick) },
         onCreateNoteClick = onCreateNoteClick,
+        onSettingsClick = onSettingsClick,
         onEvent = { onEvent(it) }
     )
 
@@ -81,8 +84,8 @@ fun HomeScreenContent(
     modifier: Modifier = Modifier,
     searchQuery: String,
     noteList: List<Note>,
-    onOpenFiltersClick: () -> Unit,
     onCreateNoteClick: () -> Unit,
+    onSettingsClick: () -> Unit,
     onEvent: (HomeScreenUiEvent) -> Unit
 ) {
     val listState = rememberLazyStaggeredGridState()
@@ -90,7 +93,14 @@ fun HomeScreenContent(
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
-            MNTopBar(title = "MultiNote")
+            MNTopBar(
+                title = "MultiNote",
+                actions = {
+                    IconButton(onClick = onSettingsClick) {
+                        Icon(imageVector = Icons.Default.Settings, contentDescription = null)
+                    }
+                }
+            )
         },
         floatingActionButton = {
             AnimatedVisibility(
@@ -117,7 +127,7 @@ fun HomeScreenContent(
             SearchField(
                 value = searchQuery,
                 onSearch = { onEvent(HomeScreenUiEvent.OnSearchClick) },
-                onFilterClick = onOpenFiltersClick,
+                onFilterClick = { onEvent(HomeScreenUiEvent.OnShowFilterSheetClick) },
                 onValueChange = { onEvent(HomeScreenUiEvent.OnQueryEntering(it)) }
             )
             AnimatedVisibility(visible = noteList.isNotEmpty()) {
@@ -238,7 +248,7 @@ private fun PreviewHomeScreenWithEmpty() {
     HomeScreenContent(
         searchQuery = "",
         noteList = emptyList(),
-        onOpenFiltersClick = {},
+        onSettingsClick = {},
         onCreateNoteClick = {}
     ) { }
 }
@@ -290,7 +300,7 @@ private fun PreviewHomeScreen() {
                 videoPath = null
             )
         ),
-        onOpenFiltersClick = {},
+        onSettingsClick = {},
         onCreateNoteClick = {}
     ) { }
 }
