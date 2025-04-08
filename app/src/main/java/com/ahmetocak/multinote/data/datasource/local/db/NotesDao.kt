@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.Flow
 interface NotesDao {
 
     @Insert
-    suspend fun addNote(note: Note)
+    suspend fun addNote(note: Note): Long
 
     @Query("SELECT * FROM notes_table")
     fun observeNotes(): Flow<List<Note>>

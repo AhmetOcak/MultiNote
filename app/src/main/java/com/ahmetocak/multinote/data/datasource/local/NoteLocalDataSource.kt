@@ -4,7 +4,7 @@ import com.ahmetocak.multinote.model.Note
 import kotlinx.coroutines.flow.Flow
 
 interface NoteLocalDataSource {
-    suspend fun addNote(note: Note)
+    suspend fun addNote(note: Note): Long
     fun observeNotes(): Flow<List<Note>>
     suspend fun getNoteById(id: Int): Note
     suspend fun deleteNote(id: Int)

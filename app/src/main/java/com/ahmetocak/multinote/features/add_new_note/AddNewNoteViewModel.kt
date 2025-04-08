@@ -11,6 +11,7 @@ import com.ahmetocak.multinote.model.NoteType
 import com.ahmetocak.multinote.utils.audio.recorder.AudioRecorder
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -93,7 +94,8 @@ class AddNewNoteViewModel @Inject constructor(
 
     fun isSaveReady(): Boolean {
         val state = _uiState.value
-        val isMandatoryFieldsFill = state.titleValue.isNotEmpty() && state.descriptionValue.isNotEmpty()
+        val isMandatoryFieldsFill =
+            state.titleValue.isNotEmpty() && state.descriptionValue.isNotEmpty()
         return when (state.selectedNoteType) {
             NoteType.TEXT -> isMandatoryFieldsFill
             NoteType.IMAGE -> isMandatoryFieldsFill && state.selectedImage != null
@@ -106,7 +108,7 @@ class AddNewNoteViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             val state = _uiState.value
             try {
-                notesRepository.addNote(
+                val result = notesRepository.addNote(
                     note = Note(
                         title = state.titleValue,
                         description = state.titleValue,
@@ -117,6 +119,19 @@ class AddNewNoteViewModel @Inject constructor(
                         videoPath = state.selectedVideo?.path
                     )
                 )
+
+                if (result != -1L && result >= 0L) {
+                    _uiState.update {
+                        it.copy(showSaveNoteSuccessMessage = true)
+                    }
+                }
+
+                viewModelScope.launch {
+                    delay(3000)
+                    _uiState.update {
+                        it.copy(showSaveNoteSuccessMessage = false)
+                    }
+                }
                 resetAllData()
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -148,6 +163,7 @@ data class AddNewNoteUiState(
     val selectedVideo: Uri? = null,
     val selectedAudio: Uri? = null,
     val hideSheet: Boolean = false,
+    val showSaveNoteSuccessMessage: Boolean = false,
     val audioRecordStatus: AudioRecordStatus = AudioRecordStatus.IDLE
 )
 

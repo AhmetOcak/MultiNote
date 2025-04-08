@@ -10,6 +10,11 @@ import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideIn
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -48,6 +53,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
@@ -73,6 +79,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.ahmetocak.multinote.core.ui.components.MNTopBar
+import com.ahmetocak.multinote.core.ui.components.ProcessResultWarning
 import com.ahmetocak.multinote.features.add_new_note.components.MediaBottomSheet
 import com.ahmetocak.multinote.model.NoteTag
 import com.ahmetocak.multinote.model.NoteType
@@ -81,6 +88,7 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.google.accompanist.permissions.rememberPermissionState
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.io.File
 
@@ -165,6 +173,11 @@ fun AddNewNoteScreen(
 
     val microphonePermissionState = rememberPermissionState(
         permission = Manifest.permission.RECORD_AUDIO
+    )
+
+    ProcessResultWarning(
+        message = "Not başarılı bir şekilde kaydedildi",
+        visible = uiState.showSaveNoteSuccessMessage
     )
 
     AddNewNoteScreenContent(
