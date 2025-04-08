@@ -123,7 +123,7 @@ class AddNewNoteViewModel @Inject constructor(
                 val result = notesRepository.addNote(
                     note = Note(
                         title = state.titleValue,
-                        description = state.titleValue,
+                        description = state.descriptionValue,
                         tag = state.selectedNoteTag.ordinal,
                         noteType = state.selectedNoteType.ordinal,
                         audioPath = state.selectedAudios.map { it.toString() },
