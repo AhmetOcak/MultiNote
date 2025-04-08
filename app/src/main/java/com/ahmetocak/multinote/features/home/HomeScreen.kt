@@ -60,6 +60,7 @@ fun HomeScreen(
     modifier: Modifier = Modifier,
     onCreateNoteClick: () -> Unit,
     onSettingsClick: () -> Unit,
+    onCardClick: (Int) -> Unit,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -74,6 +75,7 @@ fun HomeScreen(
         onCreateNoteClick = onCreateNoteClick,
         onSettingsClick = onSettingsClick,
         homeScreenState = uiState.screenState,
+        onCardClick = onCardClick,
         onEvent = { onEvent(it) }
     )
 
@@ -90,6 +92,7 @@ fun HomeScreenContent(
     onCreateNoteClick: () -> Unit,
     onSettingsClick: () -> Unit,
     homeScreenState: HomeScreenState,
+    onCardClick: (Int) -> Unit,
     onEvent: (HomeScreenUiEvent) -> Unit
 ) {
     val listState = rememberLazyStaggeredGridState()
@@ -169,7 +172,8 @@ fun HomeScreenContent(
                                     NoteType.TEXT.ordinal -> {
                                         TextNoteCard(
                                             title = it.title,
-                                            description = it.description
+                                            description = it.description,
+                                            onClick = { onCardClick(it.id) }
                                         )
                                     }
 
@@ -177,14 +181,16 @@ fun HomeScreenContent(
                                         ImageNoteCard(
                                             title = it.title,
                                             description = it.description,
-                                            imagePath = it.imagePath
+                                            imagePath = it.imagePath,
+                                            onClick = { onCardClick(it.id) }
                                         )
                                     }
 
                                     NoteType.AUDIO.ordinal -> {
                                         AudioNoteCard(
                                             title = it.title,
-                                            description = it.description
+                                            description = it.description,
+                                            onClick = { onCardClick(it.id) }
                                         )
                                     }
 
@@ -275,7 +281,8 @@ private fun PreviewHomeScreenWithEmpty() {
         noteList = emptyList(),
         onSettingsClick = {},
         homeScreenState = HomeScreenState.Idle,
-        onCreateNoteClick = {}
+        onCreateNoteClick = {},
+        onCardClick = {}
     ) { }
 }
 
@@ -328,6 +335,7 @@ private fun PreviewHomeScreen() {
         ),
         onSettingsClick = {},
         onCreateNoteClick = {},
-        homeScreenState = HomeScreenState.Idle
+        homeScreenState = HomeScreenState.Idle,
+        onCardClick = {}
     ) { }
 }

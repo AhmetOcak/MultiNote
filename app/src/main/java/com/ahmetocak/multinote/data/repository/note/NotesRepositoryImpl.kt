@@ -12,7 +12,7 @@ class NotesRepositoryImpl @Inject constructor(
 
     override fun observeNotes(): Flow<List<Note>> = notesLocalDataSource.observeNotes()
 
-    override suspend fun getNoteById(id: Int): Note = notesLocalDataSource.getNoteById(id)
+    override suspend fun getNoteById(id: Int) = notesLocalDataSource.getNoteById(id)
 
     override suspend fun deleteNote(id: Int) = notesLocalDataSource.deleteNote(id)
 

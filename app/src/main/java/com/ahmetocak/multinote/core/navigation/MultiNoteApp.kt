@@ -42,7 +42,8 @@ fun MultiNoteApp(
                     currentScheme = currentScheme,
                     onCreateNoteClick = appNavController::navigateCreateNote,
                     onSettingsClick = appNavController::navigateSettings,
-                    onNavigateUpClick = appNavController::upPress
+                    onNavigateUpClick = appNavController::upPress,
+                    onCardClick = appNavController::navigateNote
                 )
             }
         }
@@ -55,12 +56,14 @@ private fun NavGraphBuilder.navGraph(
     currentScheme: CustomColorScheme,
     onCreateNoteClick: (NavBackStackEntry) -> Unit,
     onSettingsClick: (NavBackStackEntry) -> Unit,
+    onCardClick: (NavBackStackEntry, Int) -> Unit,
     onNavigateUpClick: () -> Unit
 ) {
     composable(route = Destinations.HOME_ROUTE) {
         HomeScreen(
             onCreateNoteClick = { onCreateNoteClick(it) },
-            onSettingsClick = { onSettingsClick(it) }
+            onSettingsClick = { onSettingsClick(it) },
+            onCardClick = { id -> onCardClick(it, id) }
         )
     }
     composable(route = Destinations.SETTINGS_ROUTE) {

@@ -32,8 +32,8 @@ val dummyImgId = R.drawable.test
 private const val MAX_LINE = 12
 
 @Composable
-fun TextNoteCard(title: String, description: String) {
-    Card(modifier = Modifier.fillMaxWidth()) {
+fun TextNoteCard(title: String, description: String, onClick: () -> Unit) {
+    Card(modifier = Modifier.fillMaxWidth(), onClick = onClick) {
         Column(
             modifier = Modifier
                 .padding(16.dp),
@@ -53,8 +53,8 @@ fun TextNoteCard(title: String, description: String) {
 }
 
 @Composable
-fun ImageNoteCard(title: String, description: String, imagePath: String?) {
-    Card(modifier = Modifier.fillMaxWidth()) {
+fun ImageNoteCard(title: String, description: String, imagePath: String?, onClick: () -> Unit) {
+    Card(modifier = Modifier.fillMaxWidth(), onClick = onClick) {
         Column(
             modifier = Modifier.padding(bottom = 16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -79,8 +79,8 @@ fun ImageNoteCard(title: String, description: String, imagePath: String?) {
 }
 
 @Composable
-fun AudioNoteCard(title: String, description: String) {
-    Card(modifier = Modifier.fillMaxWidth()) {
+fun AudioNoteCard(title: String, description: String, onClick: () -> Unit) {
+    Card(modifier = Modifier.fillMaxWidth(), onClick = onClick) {
         Column(
             modifier = Modifier.padding(vertical = 16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)

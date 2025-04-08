@@ -12,7 +12,7 @@ class NoteLocalDataSourceImpl @Inject constructor(
 
     override fun observeNotes(): Flow<List<Note>> = notesDao.observeNotes()
 
-    override suspend fun getNoteById(id: Int): Note = notesDao.getNoteById(id)
+    override suspend fun getNoteById(id: Int) = notesDao.getNoteById(id)
 
     override suspend fun deleteNote(id: Int) = notesDao.deleteNote(id)
 

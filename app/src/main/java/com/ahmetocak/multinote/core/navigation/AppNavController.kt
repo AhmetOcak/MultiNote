@@ -22,7 +22,7 @@ class AppNavController(val navController: NavHostController) {
         navController.navigateUp()
     }
 
-    fun navigateNote(noteId: Int, from: NavBackStackEntry) {
+    fun navigateNote(from: NavBackStackEntry, noteId: Int) {
         if (shouldNavigate(from)) {
             navController.navigate("${Destinations.NOTE_ROUTE}/$noteId")
         }
