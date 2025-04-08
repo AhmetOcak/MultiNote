@@ -10,11 +10,6 @@ import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideIn
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -53,7 +48,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
@@ -88,7 +82,6 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.google.accompanist.permissions.rememberPermissionState
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.io.File
 
@@ -188,9 +181,9 @@ fun AddNewNoteScreen(
         selectedNoteTag = uiState.selectedNoteTag,
         isSaveReady = viewModel.isSaveReady(),
         sheetState = sheetState,
-        selectedImage = uiState.selectedImage,
-        selectedVideo = uiState.selectedVideo,
-        selectedAudio = uiState.selectedAudio,
+        selectedImages = uiState.selectedImages,
+        selectedVideos = uiState.selectedVideos,
+        selectedAudios = uiState.selectedAudios,
         isAudioRecording = uiState.audioRecordStatus == AudioRecordStatus.RECORDING,
         onEvent = onEvent,
         onAddMediaClick = {
@@ -265,9 +258,9 @@ private fun AddNewNoteScreenContent(
     selectedNoteTag: NoteTag,
     isSaveReady: Boolean,
     sheetState: SheetState,
-    selectedImage: Uri?,
-    selectedVideo: Uri?,
-    selectedAudio: Uri?,
+    selectedImages: List<Uri>,
+    selectedVideos: List<Uri>,
+    selectedAudios: List<Uri>,
     isAudioRecording: Boolean,
     onEvent: (AddNewNoteUiEvent) -> Unit,
     onAddMediaClick: () -> Unit,
@@ -322,9 +315,9 @@ private fun AddNewNoteScreenContent(
             )
 
             AnimatedVisibility(selectedNoteType == NoteType.IMAGE) {
-                Crossfade(targetState = selectedImage, label = "IMAGE") {
+                Crossfade(targetState = selectedImages, label = "IMAGE") {
                     when (it) {
-                        null -> {
+                        emptyList<Uri>() -> {
                             AddMediaContent(
                                 text = "Click for the add Image",
                                 icon = Icons.Default.Image,
@@ -333,10 +326,10 @@ private fun AddNewNoteScreenContent(
                         }
 
                         else -> {
-                            selectedImage?.let {
+                            selectedImages.forEach { img ->
                                 AddMoreOrRemoveMedia(
                                     text = "Click for the add Image",
-                                    uri = selectedImage
+                                    uri = img
                                 )
                             }
                         }
@@ -344,9 +337,9 @@ private fun AddNewNoteScreenContent(
                 }
             }
             AnimatedVisibility(selectedNoteType == NoteType.AUDIO) {
-                Crossfade(targetState = selectedAudio, label = "VIDEO") {
+                Crossfade(targetState = selectedAudios, label = "VIDEO") {
                     when (it) {
-                        null -> {
+                        emptyList<Uri>() -> {
                             AddMediaContent(
                                 text = "Click for the add audio",
                                 icon = Icons.Default.AudioFile,
@@ -355,10 +348,10 @@ private fun AddNewNoteScreenContent(
                         }
 
                         else -> {
-                            selectedAudio?.let {
+                            selectedAudios.forEach { audio ->
                                 AddMoreOrRemoveMedia(
                                     text = "Click for the add audio",
-                                    uri = selectedAudio
+                                    uri = audio
                                 )
                             }
                         }
@@ -366,9 +359,9 @@ private fun AddNewNoteScreenContent(
                 }
             }
             AnimatedVisibility(selectedNoteType == NoteType.VIDEO) {
-                Crossfade(targetState = selectedVideo, label = "VIDEO") {
+                Crossfade(targetState = selectedVideos, label = "VIDEO") {
                     when (it) {
-                        null -> {
+                        emptyList<Uri>() -> {
                             AddMediaContent(
                                 text = "Click for the add video",
                                 icon = Icons.Default.VideoFile,
@@ -377,10 +370,10 @@ private fun AddNewNoteScreenContent(
                         }
 
                         else -> {
-                            selectedVideo?.let {
+                            selectedVideos.forEach { video ->
                                 AddMoreOrRemoveMedia(
                                     text = "Click for the add video",
-                                    uri = selectedVideo
+                                    uri = video
                                 )
                             }
                         }
@@ -600,9 +593,9 @@ private fun PreviewAddNewNoteScreen() {
         onEvent = {},
         onAddMediaClick = {},
         isSaveReady = false,
-        selectedImage = null,
-        selectedAudio = null,
-        selectedVideo = null,
+        selectedImages = emptyList(),
+        selectedAudios = emptyList(),
+        selectedVideos = emptyList(),
         isAudioRecording = false,
         sheetState = rememberStandardBottomSheetState(),
         action1Click = {},

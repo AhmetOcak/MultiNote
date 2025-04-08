@@ -33,9 +33,9 @@ class AddNewNoteViewModel @Inject constructor(
             is AddNewNoteUiEvent.OnTypeSelect -> _uiState.update {
                 it.copy(
                     selectedNoteType = event.type,
-                    selectedVideo = null,
-                    selectedImage = null,
-                    selectedAudio = null
+                    selectedVideos = emptyList(),
+                    selectedImages = emptyList(),
+                    selectedAudios = emptyList()
                 )
             }
 
@@ -76,16 +76,28 @@ class AddNewNoteViewModel @Inject constructor(
 
     fun handleAction1Click(uri: Uri) {
         when (_uiState.value.selectedNoteType) {
-            NoteType.IMAGE -> _uiState.update {
-                it.copy(selectedImage = uri)
+            NoteType.IMAGE -> {
+                val currentImageList = _uiState.value.selectedImages.toMutableList()
+                currentImageList.add(uri)
+                _uiState.update {
+                    it.copy(selectedImages = currentImageList)
+                }
             }
 
-            NoteType.AUDIO -> _uiState.update {
-                it.copy(selectedAudio = uri)
+            NoteType.AUDIO -> {
+                val currentAudioList = _uiState.value.selectedAudios.toMutableList()
+                currentAudioList.add(uri)
+                _uiState.update {
+                    it.copy(selectedAudios = currentAudioList)
+                }
             }
 
-            NoteType.VIDEO -> _uiState.update {
-                it.copy(selectedVideo = uri)
+            NoteType.VIDEO -> {
+                val currentVideoList = _uiState.value.selectedVideos.toMutableList()
+                currentVideoList.add(uri)
+                _uiState.update {
+                    it.copy(selectedVideos = currentVideoList)
+                }
             }
 
             else -> {}
@@ -98,9 +110,9 @@ class AddNewNoteViewModel @Inject constructor(
             state.titleValue.isNotEmpty() && state.descriptionValue.isNotEmpty()
         return when (state.selectedNoteType) {
             NoteType.TEXT -> isMandatoryFieldsFill
-            NoteType.IMAGE -> isMandatoryFieldsFill && state.selectedImage != null
-            NoteType.AUDIO -> isMandatoryFieldsFill && state.selectedAudio != null
-            NoteType.VIDEO -> isMandatoryFieldsFill && state.selectedVideo != null
+            NoteType.IMAGE -> isMandatoryFieldsFill && state.selectedImages.isNotEmpty()
+            NoteType.AUDIO -> isMandatoryFieldsFill && state.selectedAudios.isNotEmpty()
+            NoteType.VIDEO -> isMandatoryFieldsFill && state.selectedVideos.isNotEmpty()
         }
     }
 
@@ -114,9 +126,9 @@ class AddNewNoteViewModel @Inject constructor(
                         description = state.titleValue,
                         tag = state.selectedNoteTag.ordinal,
                         noteType = state.selectedNoteType.ordinal,
-                        audioPath = emptyList(),
-                        imagePath = emptyList(),
-                        videoPath = emptyList()
+                        audioPath = state.selectedAudios.map { it.toString() },
+                        imagePath = state.selectedImages.map { it.toString() },
+                        videoPath = state.selectedVideos.map { it.toString() }
                     )
                 )
 
@@ -146,9 +158,9 @@ class AddNewNoteViewModel @Inject constructor(
                 selectedNoteTag = NoteTag.NONE,
                 titleValue = "",
                 descriptionValue = "",
-                selectedImage = null,
-                selectedVideo = null,
-                selectedAudio = null
+                selectedImages = emptyList(),
+                selectedVideos = emptyList(),
+                selectedAudios = emptyList()
             )
         }
     }
@@ -159,9 +171,9 @@ data class AddNewNoteUiState(
     val selectedNoteTag: NoteTag = NoteTag.NONE,
     val titleValue: String = "",
     val descriptionValue: String = "",
-    val selectedImage: Uri? = null,
-    val selectedVideo: Uri? = null,
-    val selectedAudio: Uri? = null,
+    val selectedImages: List<Uri> = emptyList(),
+    val selectedVideos: List<Uri> = emptyList(),
+    val selectedAudios: List<Uri> = emptyList(),
     val hideSheet: Boolean = false,
     val showSaveNoteSuccessMessage: Boolean = false,
     val audioRecordStatus: AudioRecordStatus = AudioRecordStatus.IDLE
