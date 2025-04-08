@@ -4,6 +4,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -23,6 +24,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ContentPasteSearch
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.FloatingActionButton
@@ -71,6 +73,7 @@ fun HomeScreen(
         noteList = uiState.noteList,
         onCreateNoteClick = onCreateNoteClick,
         onSettingsClick = onSettingsClick,
+        homeScreenState = uiState.screenState,
         onEvent = { onEvent(it) }
     )
 
@@ -86,6 +89,7 @@ fun HomeScreenContent(
     noteList: List<Note>,
     onCreateNoteClick: () -> Unit,
     onSettingsClick: () -> Unit,
+    homeScreenState: HomeScreenState,
     onEvent: (HomeScreenUiEvent) -> Unit
 ) {
     val listState = rememberLazyStaggeredGridState()
@@ -96,95 +100,116 @@ fun HomeScreenContent(
             MNTopBar(
                 title = "MultiNote",
                 actions = {
-                    IconButton(onClick = onSettingsClick) {
-                        Icon(imageVector = Icons.Default.Settings, contentDescription = null)
+                    if (homeScreenState is HomeScreenState.Idle) {
+                        androidx.compose.animation.AnimatedVisibility(visible = true) {
+                            IconButton(onClick = onSettingsClick) {
+                                Icon(imageVector = Icons.Default.Settings, contentDescription = null)
+                            }
+                        }
                     }
                 }
             )
         },
         floatingActionButton = {
-            AnimatedVisibility(
-                visible = listState.isScrollingUp().value,
-                enter = scaleIn(),
-                exit = scaleOut()
+            if (homeScreenState is HomeScreenState.Idle) {
+                AnimatedVisibility(
+                    visible = listState.isScrollingUp().value,
+                    enter = scaleIn(),
+                    exit = scaleOut()
 
-            ) {
-                FloatingActionButton(onClick = onCreateNoteClick) {
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = null
-                    )
+                ) {
+                    FloatingActionButton(onClick = onCreateNoteClick) {
+                        Icon(
+                            imageVector = Icons.Default.Add,
+                            contentDescription = null
+                        )
+                    }
                 }
             }
         }
     ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            SearchField(
-                value = searchQuery,
-                onSearch = { onEvent(HomeScreenUiEvent.OnSearchClick) },
-                onFilterClick = { onEvent(HomeScreenUiEvent.OnShowFilterSheetClick) },
-                onValueChange = { onEvent(HomeScreenUiEvent.OnQueryEntering(it)) }
-            )
-            AnimatedVisibility(visible = noteList.isNotEmpty()) {
-                LazyVerticalStaggeredGrid(
+        when (homeScreenState) {
+            HomeScreenState.Loading -> {
+                Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(horizontal = 16.dp),
-                    state = listState,
-                    columns = StaggeredGridCells.Fixed(2),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalItemSpacing = 8.dp,
-                    contentPadding = PaddingValues(vertical = 16.dp)
+                        .padding(innerPadding),
+                    contentAlignment = Alignment.Center
                 ) {
-                    items(noteList, key = { it.id }) {
-                        when (it.noteType) {
-                            NoteType.TEXT.ordinal -> {
-                                TextNoteCard(
-                                    title = it.title,
-                                    description = it.description
-                                )
-                            }
+                    CircularProgressIndicator()
+                }
+            }
 
-                            NoteType.IMAGE.ordinal -> {
-                                ImageNoteCard(
-                                    title = it.title,
-                                    description = it.description,
-                                    imagePath = it.imagePath
-                                )
-                            }
+            HomeScreenState.Idle -> {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    SearchField(
+                        value = searchQuery,
+                        onSearch = { onEvent(HomeScreenUiEvent.OnSearchClick) },
+                        onFilterClick = { onEvent(HomeScreenUiEvent.OnShowFilterSheetClick) },
+                        onValueChange = { onEvent(HomeScreenUiEvent.OnQueryEntering(it)) }
+                    )
+                    AnimatedVisibility(visible = noteList.isNotEmpty()) {
+                        LazyVerticalStaggeredGrid(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(horizontal = 16.dp),
+                            state = listState,
+                            columns = StaggeredGridCells.Fixed(2),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalItemSpacing = 8.dp,
+                            contentPadding = PaddingValues(vertical = 16.dp)
+                        ) {
+                            items(noteList, key = { it.id }) {
+                                when (it.noteType) {
+                                    NoteType.TEXT.ordinal -> {
+                                        TextNoteCard(
+                                            title = it.title,
+                                            description = it.description
+                                        )
+                                    }
 
-                            NoteType.AUDIO.ordinal -> {
-                                AudioNoteCard(
-                                    title = it.title,
-                                    description = it.description
-                                )
-                            }
+                                    NoteType.IMAGE.ordinal -> {
+                                        ImageNoteCard(
+                                            title = it.title,
+                                            description = it.description,
+                                            imagePath = it.imagePath
+                                        )
+                                    }
 
-                            NoteType.VIDEO.ordinal -> {
+                                    NoteType.AUDIO.ordinal -> {
+                                        AudioNoteCard(
+                                            title = it.title,
+                                            description = it.description
+                                        )
+                                    }
 
+                                    NoteType.VIDEO.ordinal -> {
+
+                                    }
+                                }
                             }
                         }
                     }
-                }
-            }
-            if (noteList.isEmpty()) {
-                Column(
-                    modifier = Modifier.fillMaxSize(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    Icon(
-                        modifier = Modifier.size(128.dp),
-                        imageVector = Icons.Default.ContentPasteSearch,
-                        contentDescription = null
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text(text = "There is no notes...")
+                    if (noteList.isEmpty()) {
+                        Column(
+                            modifier = Modifier.fillMaxSize(),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            Icon(
+                                modifier = Modifier.size(128.dp),
+                                imageVector = Icons.Default.ContentPasteSearch,
+                                contentDescription = null
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Text(text = "There is no notes...")
+                        }
+                    }
                 }
             }
         }
@@ -249,6 +274,7 @@ private fun PreviewHomeScreenWithEmpty() {
         searchQuery = "",
         noteList = emptyList(),
         onSettingsClick = {},
+        homeScreenState = HomeScreenState.Idle,
         onCreateNoteClick = {}
     ) { }
 }
@@ -301,6 +327,7 @@ private fun PreviewHomeScreen() {
             )
         ),
         onSettingsClick = {},
-        onCreateNoteClick = {}
+        onCreateNoteClick = {},
+        homeScreenState = HomeScreenState.Idle
     ) { }
 }
