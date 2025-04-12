@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Card
@@ -17,9 +18,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import com.ahmetocak.multinote.BracketShortCuts
-import com.ahmetocak.multinote.CharacterEffects
-import com.ahmetocak.multinote.KeyboardShortCuts
+import com.ahmetocak.multinote.utils.BracketShortCuts
+import com.ahmetocak.multinote.utils.CharacterEffects
+import com.ahmetocak.multinote.utils.KeyboardShortCuts
 
 @Composable
 fun NoteShortcut(
@@ -30,8 +31,10 @@ fun NoteShortcut(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .zIndex(1f),
-        contentAlignment = Alignment.Center
+            .zIndex(1f)
+            .padding(bottom = 16.dp)
+            .imePadding(),
+        contentAlignment = Alignment.BottomCenter
     ) {
         Column(
             modifier = Modifier

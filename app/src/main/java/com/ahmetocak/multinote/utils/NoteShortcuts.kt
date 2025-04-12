@@ -1,4 +1,4 @@
-package com.ahmetocak.multinote
+package com.ahmetocak.multinote.utils
 
 enum class KeyboardShortCuts(private val symbol: String) {
     DOT("• "),
