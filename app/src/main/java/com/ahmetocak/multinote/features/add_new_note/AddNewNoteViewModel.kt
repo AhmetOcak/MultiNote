@@ -30,13 +30,40 @@ class AddNewNoteViewModel @Inject constructor(
 
     fun onEvent(event: AddNewNoteUiEvent) {
         when (event) {
-            is AddNewNoteUiEvent.OnTypeSelect -> _uiState.update {
-                it.copy(
-                    selectedNoteType = event.type,
-                    selectedVideos = emptyList(),
-                    selectedImages = emptyList(),
-                    selectedAudios = emptyList()
-                )
+            is AddNewNoteUiEvent.OnTypeSelect -> {
+                _uiState.update {
+                    it.copy(selectedNoteType = event.type)
+                }
+
+                when (uiState.value.selectedNoteType) {
+                    NoteType.IMAGE -> {
+                        _uiState.update {
+                            it.copy(selectedVideos = emptyList(), selectedAudios = emptyList())
+                        }
+                    }
+
+                    NoteType.VIDEO -> {
+                        _uiState.update {
+                            it.copy(selectedImages = emptyList(), selectedAudios = emptyList())
+                        }
+                    }
+
+                    NoteType.AUDIO -> {
+                        _uiState.update {
+                            it.copy(selectedImages = emptyList(), selectedVideos = emptyList())
+                        }
+                    }
+
+                    NoteType.TEXT -> {
+                        _uiState.update {
+                            it.copy(
+                                selectedVideos = emptyList(),
+                                selectedImages = emptyList(),
+                                selectedAudios = emptyList()
+                            )
+                        }
+                    }
+                }
             }
 
             is AddNewNoteUiEvent.OnTagSelect -> _uiState.update {
