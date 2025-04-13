@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -77,6 +78,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -677,17 +679,31 @@ private fun AudioItem(content: Uri, context: Context) {
     val audioDuration = remember(content) {
         getAudioDuration(context, content)
     }
+    val minute = if (audioDuration.first.length == 1) {
+        "0${audioDuration.first}"
+    } else audioDuration.first
+    val second = if (audioDuration.second.length == 1) {
+        "0${audioDuration.second}"
+    } else audioDuration.second
+
     Column(
         modifier = Modifier.fillMaxHeight(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceEvenly
     ) {
         Icon(
-            modifier = Modifier.fillMaxHeight(),
+            modifier = Modifier
+                .weight(1f)
+                .aspectRatio(1f),
             imageVector = Icons.Default.AudioFile,
-            contentDescription = null
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.error
         )
-        Text(text = "${audioDuration.first}:${audioDuration.second}")
+        Text(
+            text = "$minute:$second",
+            style = MaterialTheme.typography.labelLarge,
+            fontWeight = FontWeight.W600
+        )
     }
 }
 
