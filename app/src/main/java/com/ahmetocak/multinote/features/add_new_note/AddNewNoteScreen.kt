@@ -1,6 +1,7 @@
 package com.ahmetocak.multinote.features.add_new_note
 
 import android.Manifest
+import android.content.Context
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
@@ -10,6 +11,8 @@ import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -57,6 +60,7 @@ import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -67,6 +71,7 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
@@ -84,6 +89,8 @@ import com.ahmetocak.multinote.core.ui.components.ProcessResultWarning
 import com.ahmetocak.multinote.features.add_new_note.components.MediaBottomSheet
 import com.ahmetocak.multinote.model.NoteTag
 import com.ahmetocak.multinote.model.NoteType
+import com.ahmetocak.multinote.utils.getAudioDuration
+import com.ahmetocak.multinote.utils.getVideoThumbnail
 import com.ahmetocak.multinote.utils.toStringResource
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
@@ -588,6 +595,8 @@ private fun AddMoreOrRemoveMedia(
     onAddMediaClick: () -> Unit,
     onRemoveMediaClick: (Int) -> Unit
 ) {
+    val context = LocalContext.current
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -601,11 +610,20 @@ private fun AddMoreOrRemoveMedia(
                 .padding(end = 4.dp),
             contentAlignment = Alignment.TopEnd
         ) {
-            Icon(
-                modifier = Modifier.clickable(onClick = onAddMediaClick),
-                imageVector = Icons.Default.Add,
-                contentDescription = null
-            )
+            Box(
+                modifier = Modifier.background(
+                    color = Color(0x80FFFFFF),
+                    shape = RoundedCornerShape(25)
+                )
+            ) {
+                Icon(
+                    modifier = Modifier
+                        .padding(2.dp)
+                        .clickable(onClick = onAddMediaClick),
+                    imageVector = Icons.Default.Add,
+                    contentDescription = null
+                )
+            }
         }
         LazyRow(
             modifier = Modifier.fillMaxWidth(),
@@ -629,25 +647,62 @@ private fun AddMoreOrRemoveMedia(
                                 )
                             }
 
-                            NoteType.VIDEO -> {
-
-                            }
-
-                            NoteType.AUDIO -> {
-
-                            }
-
+                            NoteType.VIDEO -> VideoItem(content, context)
+                            NoteType.AUDIO -> AudioItem(content, context)
                             else -> {}
                         }
-                        Icon(
-                            modifier = Modifier.clickable(onClick = { onRemoveMediaClick(index) }),
-                            imageVector = Icons.Default.Remove,
-                            contentDescription = null
-                        )
+                        Box(
+                            modifier = Modifier
+                                .padding(top = 4.dp, end = 4.dp)
+                                .background(
+                                    color = Color(0x80FFFFFF),
+                                    shape = RoundedCornerShape(25)
+                                )
+                        ) {
+                            Icon(
+                                modifier = Modifier.clickable(onClick = { onRemoveMediaClick(index) }),
+                                imageVector = Icons.Default.Remove,
+                                contentDescription = null
+                            )
+                        }
                     }
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun AudioItem(content: Uri, context: Context) {
+    val audioDuration = remember(content) {
+        getAudioDuration(context, content)
+    }
+    Column(
+        modifier = Modifier.fillMaxHeight(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.SpaceEvenly
+    ) {
+        Icon(
+            modifier = Modifier.fillMaxHeight(),
+            imageVector = Icons.Default.AudioFile,
+            contentDescription = null
+        )
+        Text(text = "${audioDuration.first}:${audioDuration.second}")
+    }
+}
+
+@Composable
+private fun VideoItem(content: Uri, context: Context) {
+    val bitmap = remember(content) {
+        getVideoThumbnail(context, content)
+    }
+    bitmap?.let {
+        Image(
+            modifier = Modifier.fillMaxHeight(),
+            bitmap = it.asImageBitmap(),
+            contentDescription = null,
+            contentScale = ContentScale.Fit
+        )
     }
 }
 
