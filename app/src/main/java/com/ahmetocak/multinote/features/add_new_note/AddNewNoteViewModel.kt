@@ -71,6 +71,38 @@ class AddNewNoteViewModel @Inject constructor(
             }
 
             is AddNewNoteUiEvent.OnSaveNoteClick -> addNote()
+
+            is AddNewNoteUiEvent.OnRemoveMediaClick -> removeMedia(index = event.index)
+        }
+    }
+
+    private fun removeMedia(index: Int) {
+        when (_uiState.value.selectedNoteType) {
+            NoteType.IMAGE -> {
+                val currentList = _uiState.value.selectedImages.toMutableList()
+                currentList.removeAt(index)
+                _uiState.update {
+                    it.copy(selectedImages = currentList)
+                }
+            }
+
+            NoteType.AUDIO -> {
+                val currentList = _uiState.value.selectedAudios.toMutableList()
+                currentList.removeAt(index)
+                _uiState.update {
+                    it.copy(selectedAudios = currentList)
+                }
+            }
+
+            NoteType.VIDEO -> {
+                val currentList = _uiState.value.selectedVideos.toMutableList()
+                currentList.removeAt(index)
+                _uiState.update {
+                    it.copy(selectedVideos = currentList)
+                }
+            }
+
+            else -> {}
         }
     }
 
@@ -186,6 +218,7 @@ sealed class AddNewNoteUiEvent {
     data class OnDescriptionValueChange(val value: String) : AddNewNoteUiEvent()
     data object OnRecordAudioClick : AddNewNoteUiEvent()
     data object OnSaveNoteClick : AddNewNoteUiEvent()
+    data class OnRemoveMediaClick(val index: Int) : AddNewNoteUiEvent()
 }
 
 sealed interface AudioRecordStatus {

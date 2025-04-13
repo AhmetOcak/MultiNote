@@ -10,16 +10,21 @@ import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
@@ -27,10 +32,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AudioFile
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Mic
+import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.VideoFile
 import androidx.compose.material.icons.filled.Videocam
 import androidx.compose.material3.Button
@@ -326,12 +333,16 @@ private fun AddNewNoteScreenContent(
                         }
 
                         else -> {
-                            selectedImages.forEach { img ->
-                                AddMoreOrRemoveMedia(
-                                    text = "Click for the add Image",
-                                    uri = img
-                                )
-                            }
+                            AddMoreOrRemoveMedia(
+                                mediaType = NoteType.IMAGE,
+                                uri = selectedImages,
+                                onAddMediaClick = onAddMediaClick,
+                                onRemoveMediaClick = { index ->
+                                    onEvent(
+                                        AddNewNoteUiEvent.OnRemoveMediaClick(index)
+                                    )
+                                }
+                            )
                         }
                     }
                 }
@@ -348,12 +359,16 @@ private fun AddNewNoteScreenContent(
                         }
 
                         else -> {
-                            selectedAudios.forEach { audio ->
-                                AddMoreOrRemoveMedia(
-                                    text = "Click for the add audio",
-                                    uri = audio
-                                )
-                            }
+                            AddMoreOrRemoveMedia(
+                                mediaType = NoteType.AUDIO,
+                                uri = selectedAudios,
+                                onAddMediaClick = onAddMediaClick,
+                                onRemoveMediaClick = { index ->
+                                    onEvent(
+                                        AddNewNoteUiEvent.OnRemoveMediaClick(index)
+                                    )
+                                }
+                            )
                         }
                     }
                 }
@@ -370,12 +385,16 @@ private fun AddNewNoteScreenContent(
                         }
 
                         else -> {
-                            selectedVideos.forEach { video ->
-                                AddMoreOrRemoveMedia(
-                                    text = "Click for the add video",
-                                    uri = video
-                                )
-                            }
+                            AddMoreOrRemoveMedia(
+                                mediaType = NoteType.VIDEO,
+                                uri = selectedVideos,
+                                onAddMediaClick = onAddMediaClick,
+                                onRemoveMediaClick = { index ->
+                                    onEvent(
+                                        AddNewNoteUiEvent.OnRemoveMediaClick(index)
+                                    )
+                                }
+                            )
                         }
                     }
                 }
@@ -533,7 +552,7 @@ private fun AddMediaContent(text: String, icon: ImageVector, onClick: () -> Unit
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(112.dp)
+            .height(144.dp)
             .drawBehind {
                 drawRoundRect(
                     color = Color.Black,
@@ -563,20 +582,71 @@ private fun AddMediaContent(text: String, icon: ImageVector, onClick: () -> Unit
 }
 
 @Composable
-private fun AddMoreOrRemoveMedia(text: String, uri: Uri) {
+private fun AddMoreOrRemoveMedia(
+    mediaType: NoteType,
+    uri: List<Uri>,
+    onAddMediaClick: () -> Unit,
+    onRemoveMediaClick: (Int) -> Unit
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(144.dp),
+            .height(168.dp),
         shape = RoundedCornerShape(12.dp)
     ) {
-        Box(modifier = Modifier.fillMaxSize()) {
-            AsyncImage(
-                modifier = Modifier.fillMaxSize(),
-                model = uri,
-                contentDescription = null,
-                contentScale = ContentScale.FillBounds
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 4.dp)
+                .padding(end = 4.dp),
+            contentAlignment = Alignment.TopEnd
+        ) {
+            Icon(
+                modifier = Modifier.clickable(onClick = onAddMediaClick),
+                imageVector = Icons.Default.Add,
+                contentDescription = null
             )
+        }
+        LazyRow(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            contentPadding = PaddingValues(8.dp)
+        ) {
+            itemsIndexed(uri) { index, content ->
+                Card {
+                    Box(
+                        modifier = Modifier.fillMaxHeight(),
+                        contentAlignment = Alignment.TopEnd
+                    ) {
+                        when (mediaType) {
+                            NoteType.IMAGE -> {
+                                AsyncImage(
+                                    modifier = Modifier.fillMaxHeight(),
+                                    model = content,
+                                    contentDescription = null,
+                                    contentScale = ContentScale.Fit
+                                )
+                            }
+
+                            NoteType.VIDEO -> {
+
+                            }
+
+                            NoteType.AUDIO -> {
+
+                            }
+
+                            else -> {}
+                        }
+                        Icon(
+                            modifier = Modifier.clickable(onClick = { onRemoveMediaClick(index) }),
+                            imageVector = Icons.Default.Remove,
+                            contentDescription = null
+                        )
+                    }
+                }
+            }
         }
     }
 }
