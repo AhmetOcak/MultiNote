@@ -284,6 +284,8 @@ private fun AddNewNoteScreenContent(
     action2Click: () -> Unit,
     onNavigateUpClick: () -> Unit
 ) {
+    val context = LocalContext.current
+
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
@@ -412,7 +414,7 @@ private fun AddNewNoteScreenContent(
             Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterEnd) {
                 Button(
                     enabled = isSaveReady,
-                    onClick = { onEvent(AddNewNoteUiEvent.OnSaveNoteClick) }) {
+                    onClick = { onEvent(AddNewNoteUiEvent.OnSaveNoteClick(context = context)) }) {
                     Text(text = "Save")
                 }
             }
@@ -423,6 +425,8 @@ private fun AddNewNoteScreenContent(
                         MediaBottomSheet(
                             action1Image = Icons.Default.Image,
                             action2Image = Icons.Default.CameraAlt,
+                            action1Text = "From Gallery",
+                            action2Text = "Capture Photo",
                             sheetState = sheetState,
                             action1OnClick = action1Click,
                             action2OnClick = action2Click
@@ -433,6 +437,8 @@ private fun AddNewNoteScreenContent(
                         MediaBottomSheet(
                             action1Image = Icons.Default.AudioFile,
                             action2Image = Icons.Default.Mic,
+                            action1Text = "From Device",
+                            action2Text = "Record Audio",
                             sheetState = sheetState,
                             isAudioRecording = isAudioRecording,
                             onSaveAudioClick = { onEvent(AddNewNoteUiEvent.OnRecordAudioClick) },
@@ -445,6 +451,8 @@ private fun AddNewNoteScreenContent(
                         MediaBottomSheet(
                             action1Image = Icons.Default.VideoFile,
                             action2Image = Icons.Default.Videocam,
+                            action1Text = "From Gallery",
+                            action2Text = "Record Video",
                             sheetState = sheetState,
                             action1OnClick = action1Click,
                             action2OnClick = action2Click

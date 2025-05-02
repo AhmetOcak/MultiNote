@@ -1,5 +1,8 @@
 package com.ahmetocak.multinote.utils
 
+import android.content.Context
+import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
@@ -10,6 +13,7 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.platform.LocalDensity
 import com.ahmetocak.multinote.model.NoteTag
+import java.io.File
 
 @Composable
 fun LazyStaggeredGridState.isScrollingUp(): State<Boolean> {
@@ -42,4 +46,20 @@ fun NoteTag.toPublicName(): String {
 fun keyboardAsState(): State<Boolean> {
     val isImeVisible = WindowInsets.ime.getBottom(LocalDensity.current) > 0
     return rememberUpdatedState(isImeVisible)
+}
+
+fun Uri.toFile(context: Context): File? {
+    val inputStream = context.contentResolver.openInputStream(this)
+    val tempFile = File.createTempFile("temp", ".jpg")
+    return try {
+        tempFile.outputStream().use { fileOut ->
+            inputStream?.copyTo(fileOut)
+        }
+        tempFile.deleteOnExit()
+        inputStream?.close()
+        Log.d("MultiNote App: saved image file path -> ", tempFile.path)
+        tempFile
+    } catch (e: Exception) {
+        null
+    }
 }

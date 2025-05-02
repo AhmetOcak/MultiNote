@@ -1,5 +1,6 @@
 package com.ahmetocak.multinote.features.add_new_note
 
+import android.content.Context
 import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
@@ -9,6 +10,7 @@ import com.ahmetocak.multinote.model.Note
 import com.ahmetocak.multinote.model.NoteTag
 import com.ahmetocak.multinote.model.NoteType
 import com.ahmetocak.multinote.utils.audio.recorder.AudioRecorder
+import com.ahmetocak.multinote.utils.toFile
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -97,7 +99,7 @@ class AddNewNoteViewModel @Inject constructor(
                 }
             }
 
-            is AddNewNoteUiEvent.OnSaveNoteClick -> addNote()
+            is AddNewNoteUiEvent.OnSaveNoteClick -> addNote(context = event.context)
 
             is AddNewNoteUiEvent.OnRemoveMediaClick -> removeMedia(index = event.index)
         }
@@ -175,7 +177,7 @@ class AddNewNoteViewModel @Inject constructor(
         }
     }
 
-    private fun addNote() {
+    private fun addNote(context: Context) {
         viewModelScope.launch(Dispatchers.IO) {
             val state = _uiState.value
             try {
@@ -186,7 +188,7 @@ class AddNewNoteViewModel @Inject constructor(
                         tag = state.selectedNoteTag.ordinal,
                         noteType = state.selectedNoteType.ordinal,
                         audioPath = state.selectedAudios.map { it.toString() },
-                        imagePath = state.selectedImages.map { it.toString() },
+                        imagePath = state.selectedImages.map { it.toFile(context)?.path ?: "" },
                         videoPath = state.selectedVideos.map { it.toString() }
                     )
                 )
@@ -244,7 +246,7 @@ sealed class AddNewNoteUiEvent {
     data class OnTitleValueChange(val value: String) : AddNewNoteUiEvent()
     data class OnDescriptionValueChange(val value: String) : AddNewNoteUiEvent()
     data object OnRecordAudioClick : AddNewNoteUiEvent()
-    data object OnSaveNoteClick : AddNewNoteUiEvent()
+    data class OnSaveNoteClick(val context: Context)  : AddNewNoteUiEvent()
     data class OnRemoveMediaClick(val index: Int) : AddNewNoteUiEvent()
 }
 
