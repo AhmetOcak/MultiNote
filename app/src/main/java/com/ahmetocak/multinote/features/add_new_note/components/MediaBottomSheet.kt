@@ -49,6 +49,8 @@ import kotlinx.coroutines.launch
 fun MediaBottomSheet(
     action1Image: ImageVector,
     action2Image: ImageVector,
+    action1Text: String,
+    action2Text: String,
     sheetState: SheetState,
     isAudioRecording: Boolean = false,
     onSaveAudioClick: () -> Unit = {},
@@ -126,8 +128,8 @@ fun MediaBottomSheet(
                     horizontalArrangement = Arrangement.SpaceEvenly,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Action(icon = action1Image, onClick = action1OnClick)
-                    Action(icon = action2Image, onClick = action2OnClick)
+                    Action(icon = action1Image, text = action1Text, onClick = action1OnClick)
+                    Action(icon = action2Image, text = action2Text, onClick = action2OnClick)
                 }
             }
         }
@@ -135,18 +137,24 @@ fun MediaBottomSheet(
 }
 
 @Composable
-private fun Action(icon: ImageVector, onClick: () -> Unit) {
-    Card(
-        onClick = onClick,
-        shape = RoundedCornerShape(25)
+private fun Action(icon: ImageVector, text: String, onClick: () -> Unit) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        Icon(
-            modifier = Modifier
-                .padding(8.dp)
-                .size(36.dp),
-            imageVector = icon,
-            contentDescription = null
-        )
+        Card(
+            onClick = onClick,
+            shape = RoundedCornerShape(25)
+        ) {
+            Icon(
+                modifier = Modifier
+                    .padding(8.dp)
+                    .size(36.dp),
+                imageVector = icon,
+                contentDescription = null
+            )
+        }
+        Text(text = text)
     }
 }
 
@@ -158,6 +166,8 @@ private fun PreviewMediaBottomSheet() {
     MediaBottomSheet(
         action1Image = Icons.Default.Image,
         action2Image = Icons.Default.CameraAlt,
+        action1Text = "Pick up from gallery",
+        action2Text = "Use camera",
         sheetState = rememberStandardBottomSheetState(initialValue = SheetValue.Expanded),
         isAudioRecording = false,
         action1OnClick = {},
