@@ -181,7 +181,9 @@ fun HomeScreenContent(
                                         ImageNoteCard(
                                             title = it.title,
                                             description = it.description,
-                                            imagePath = "",
+                                            imagePath = if (!it.imagePath.isNullOrEmpty()) {
+                                                it.imagePath.first()
+                                            } else "",
                                             onClick = { onCardClick(it.id) }
                                         )
                                     }

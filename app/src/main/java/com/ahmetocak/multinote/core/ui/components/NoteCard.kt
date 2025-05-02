@@ -1,6 +1,5 @@
 package com.ahmetocak.multinote.core.ui.components
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,13 +16,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import coil.compose.rememberAsyncImagePainter
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.ahmetocak.multinote.R
-import java.io.File
 
 const val dummyDescription =
     "Lorem Ipsum is simply dummy text of the printing and typesetting industry. " +
@@ -59,11 +58,11 @@ fun ImageNoteCard(title: String, description: String, imagePath: String?, onClic
             modifier = Modifier.padding(bottom = 16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Image(
+            AsyncImage(
                 modifier = Modifier.fillMaxWidth(),
-                painter = if (imagePath == null) {
-                    painterResource(dummyImgId)
-                } else rememberAsyncImagePainter(File(imagePath)),
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(imagePath)
+                    .build(),
                 contentDescription = null,
                 contentScale = ContentScale.Crop
             )
