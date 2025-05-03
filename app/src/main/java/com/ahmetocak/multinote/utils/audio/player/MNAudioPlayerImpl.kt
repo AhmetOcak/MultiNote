@@ -40,7 +40,6 @@ class MNAudioPlayerImpl @Inject constructor() : AudioPlayer {
         try {
             mediaPlayer.stop()
         } catch (e: Exception) {
-
             Log.e("MNAudioPlayerImpl", e.stackTraceToString())
         }
     }
@@ -48,4 +47,6 @@ class MNAudioPlayerImpl @Inject constructor() : AudioPlayer {
     override fun releaseMediaPlayer() {
         mediaPlayer.release()
     }
+
+    override fun isPlaying(): Boolean = mediaPlayer.isPlaying
 }

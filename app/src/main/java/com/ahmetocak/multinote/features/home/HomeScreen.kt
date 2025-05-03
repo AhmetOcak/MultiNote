@@ -160,7 +160,8 @@ fun HomeScreenContent(
                         LazyVerticalStaggeredGrid(
                             modifier = Modifier
                                 .fillMaxSize()
-                                .padding(horizontal = 16.dp),
+                                .padding(horizontal = 16.dp)
+                                .padding(top = 2.dp),
                             state = listState,
                             columns = StaggeredGridCells.Fixed(2),
                             horizontalArrangement = Arrangement.spacedBy(8.dp),

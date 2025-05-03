@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.ahmetocak.multinote.core.navigation.Arguments
 import com.ahmetocak.multinote.data.repository.note.NotesRepository
 import com.ahmetocak.multinote.model.Note
+import com.ahmetocak.multinote.utils.audio.player.AudioPlayer
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,6 +19,7 @@ import javax.inject.Inject
 @HiltViewModel
 class NoteViewModel @Inject constructor(
     private val notesRepository: NotesRepository,
+    private val audioPlayer: AudioPlayer,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -31,6 +33,10 @@ class NoteViewModel @Inject constructor(
         } else {
             // TODO: Show error message
         }
+
+        audioPlayer.initializeMediaPlayer(onCompletion = {
+            audioPlayer.stop()
+        })
     }
 
     private fun getNoteWithId(noteId: Int) {
@@ -39,16 +45,52 @@ class NoteViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(
                         noteData = note,
-                        isLoading = false,
+                        isLoading = false
                     )
                 }
             }
         }
     }
+
+    fun onImageClick(imagePath: String?) {
+        if (imagePath != null) {
+            _uiState.update {
+                it.copy(noteScreenState = NoteScreenState.FullScreenImage(imagePath))
+            }
+        }
+    }
+
+    fun resetScreenState() {
+        _uiState.update {
+            it.copy(noteScreenState = NoteScreenState.Default)
+        }
+    }
+
+    fun onPlayAudioClick(audioPath: String) {
+        viewModelScope.launch {
+            if (audioPlayer.isPlaying()) {
+                audioPlayer.stop()
+            } else {
+                audioPlayer.play(audioPath)
+            }
+        }
+    }
+
+    fun isAudioPlaying() = audioPlayer.isPlaying()
+
+    override fun onCleared() {
+        super.onCleared()
+        audioPlayer.releaseMediaPlayer()
+    }
 }
 
 data class NoteUiState(
     val isLoading: Boolean = true,
-    val noteMediaPath: String? = null,
-    val noteData: Note? = null
+    val noteData: Note? = null,
+    val noteScreenState: NoteScreenState = NoteScreenState.Default,
 )
+
+sealed class NoteScreenState {
+    data object Default : NoteScreenState()
+    data class FullScreenImage(val imagePath: String) : NoteScreenState()
+}

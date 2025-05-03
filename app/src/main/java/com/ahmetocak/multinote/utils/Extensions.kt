@@ -13,6 +13,7 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.platform.LocalDensity
 import com.ahmetocak.multinote.model.NoteTag
+import com.ahmetocak.multinote.model.NoteType
 import java.io.File
 
 @Composable
@@ -48,9 +49,9 @@ fun keyboardAsState(): State<Boolean> {
     return rememberUpdatedState(isImeVisible)
 }
 
-fun Uri.toFile(context: Context): File? {
+fun Uri.toFile(context: Context, suffix: String): File? {
     val inputStream = context.contentResolver.openInputStream(this)
-    val tempFile = File.createTempFile("temp", ".jpg")
+    val tempFile = File.createTempFile("temp", suffix)
     return try {
         tempFile.outputStream().use { fileOut ->
             inputStream?.copyTo(fileOut)
@@ -61,5 +62,14 @@ fun Uri.toFile(context: Context): File? {
         tempFile
     } catch (e: Exception) {
         null
+    }
+}
+
+fun Int.getNoteType(): NoteType {
+    return when (this) {
+        NoteType.VIDEO.ordinal -> NoteType.VIDEO
+        NoteType.AUDIO.ordinal -> NoteType.AUDIO
+        NoteType.IMAGE.ordinal -> NoteType.IMAGE
+        else -> NoteType.TEXT
     }
 }

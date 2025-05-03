@@ -5,4 +5,5 @@ interface AudioPlayer {
     fun play(audioUrl: String)
     fun stop()
     fun releaseMediaPlayer()
+    fun isPlaying(): Boolean
 }

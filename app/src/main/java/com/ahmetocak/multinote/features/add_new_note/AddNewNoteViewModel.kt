@@ -90,11 +90,15 @@ class AddNewNoteViewModel @Inject constructor(
                     }
 
                     is AudioRecordStatus.RECORDING -> {
-                        _uiState.update {
-                            it.copy(audioRecordStatus = AudioRecordStatus.IDLE)
-                        }
                         val recordedAudioFile = audioRecorder.stopRecording()
-                        Log.i("MN App: Recorded file path ", recordedAudioFile.path)
+                        val currentList = _uiState.value.selectedAudios.toMutableList()
+                        currentList.add(Uri.parse(recordedAudioFile.path))
+                        _uiState.update {
+                            it.copy(
+                                audioRecordStatus = AudioRecordStatus.IDLE,
+                                selectedAudios = currentList
+                            )
+                        }
                     }
                 }
             }
@@ -187,8 +191,8 @@ class AddNewNoteViewModel @Inject constructor(
                         description = state.descriptionValue,
                         tag = state.selectedNoteTag.ordinal,
                         noteType = state.selectedNoteType.ordinal,
-                        audioPath = state.selectedAudios.map { it.toString() },
-                        imagePath = state.selectedImages.map { it.toFile(context)?.path ?: "" },
+                        audioPath = state.selectedAudios.map { it.toFile(context, ".mp3")?.path ?: "" },
+                        imagePath = state.selectedImages.map { it.toFile(context, ".jpg")?.path ?: "" },
                         videoPath = state.selectedVideos.map { it.toString() }
                     )
                 )
