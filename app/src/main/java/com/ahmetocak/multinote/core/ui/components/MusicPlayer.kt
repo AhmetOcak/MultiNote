@@ -44,7 +44,6 @@ fun AudioPlayer(
     duration: Pair<String, String>,
     onPlayButtonClicked: () -> Unit
 ) {
-    val audioDuration by remember { mutableIntStateOf(0) }
     var currentAudioPosition by remember { mutableIntStateOf(0) }
 
     ElevatedCard(

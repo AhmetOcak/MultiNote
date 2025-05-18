@@ -7,24 +7,29 @@ import javax.inject.Inject
 
 class MNAudioPlayerImpl @Inject constructor() : AudioPlayer {
 
-    private val mediaPlayer: MediaPlayer = MediaPlayer()
+    private var mediaPlayer: MediaPlayer? = null
 
     override fun initializeMediaPlayer(onCompletion: () -> Unit) {
-        mediaPlayer.setAudioAttributes(
-            AudioAttributes.Builder()
-                .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                .build()
-        )
+        try {
+            mediaPlayer = MediaPlayer()
+            mediaPlayer!!.setAudioAttributes(
+                AudioAttributes.Builder()
+                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                    .build()
+            )
 
-        mediaPlayer.setOnCompletionListener {
-            stop()
-            onCompletion()
+            mediaPlayer!!.setOnCompletionListener {
+                stop()
+                onCompletion()
+            }
+        } catch (e: Exception) {
+            Log.e("MNAudioPlayerImpl", e.stackTraceToString())
         }
     }
 
     override fun play(audioUrl: String) {
         try {
-            mediaPlayer.apply {
+            mediaPlayer!!.apply {
                 stop()
                 reset()
                 setDataSource(audioUrl)
@@ -38,15 +43,16 @@ class MNAudioPlayerImpl @Inject constructor() : AudioPlayer {
 
     override fun stop() {
         try {
-            mediaPlayer.stop()
+            mediaPlayer!!.stop()
         } catch (e: Exception) {
             Log.e("MNAudioPlayerImpl", e.stackTraceToString())
         }
     }
 
     override fun releaseMediaPlayer() {
-        mediaPlayer.release()
+        mediaPlayer?.release()
+        mediaPlayer = null
     }
 
-    override fun isPlaying(): Boolean = mediaPlayer.isPlaying
+    override fun isPlaying(): Boolean = mediaPlayer?.isPlaying ?: false
 }

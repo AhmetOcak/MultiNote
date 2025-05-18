@@ -1,5 +1,6 @@
 package com.ahmetocak.multinote.features.note
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -76,11 +77,9 @@ class NoteViewModel @Inject constructor(
         }
     }
 
-    fun isAudioPlaying() = audioPlayer.isPlaying()
-
     override fun onCleared() {
-        super.onCleared()
         audioPlayer.releaseMediaPlayer()
+        super.onCleared()
     }
 }
 
