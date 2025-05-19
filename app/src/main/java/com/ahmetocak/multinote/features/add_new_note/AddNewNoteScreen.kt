@@ -129,7 +129,7 @@ fun AddNewNoteScreen(
 
     val createMediaFile: (String) -> Uri = {
         val mediaFile = File(
-            context.getExternalFilesDir(Environment.DIRECTORY_PICTURES),
+            context.cacheDir,
             "photo_${System.currentTimeMillis()}.$it",
         )
         createdMediaFile =

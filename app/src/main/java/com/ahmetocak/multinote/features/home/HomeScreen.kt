@@ -49,6 +49,7 @@ import com.ahmetocak.multinote.core.ui.components.ImageNoteCard
 import com.ahmetocak.multinote.core.ui.components.MNTopBar
 import com.ahmetocak.multinote.core.ui.components.SearchField
 import com.ahmetocak.multinote.core.ui.components.TextNoteCard
+import com.ahmetocak.multinote.core.ui.components.VideoNoteCard
 import com.ahmetocak.multinote.model.Note
 import com.ahmetocak.multinote.model.NoteTag
 import com.ahmetocak.multinote.model.NoteType
@@ -198,7 +199,14 @@ fun HomeScreenContent(
                                     }
 
                                     NoteType.VIDEO.ordinal -> {
-
+                                        VideoNoteCard(
+                                            title = it.title,
+                                            description = it.description,
+                                            videoPath = if (!it.videoPath.isNullOrEmpty()) {
+                                                it.videoPath.first()
+                                            } else null,
+                                            onClick = { onCardClick(it.id) }
+                                        )
                                     }
                                 }
                             }

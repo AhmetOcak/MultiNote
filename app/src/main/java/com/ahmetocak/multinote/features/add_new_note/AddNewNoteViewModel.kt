@@ -192,7 +192,7 @@ class AddNewNoteViewModel @Inject constructor(
                         noteType = state.selectedNoteType.ordinal,
                         audioPath = state.selectedAudios.map { it.toFile(context, ".mp3")?.path ?: "" },
                         imagePath = state.selectedImages.map { it.toFile(context, ".jpg")?.path ?: "" },
-                        videoPath = state.selectedVideos.map { it.toString() }
+                        videoPath = state.selectedVideos.map { it.toFile(context, ".mp4")?.path ?: "" }
                     )
                 )
 

@@ -11,7 +11,10 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import com.ahmetocak.multinote.model.NoteTag
 import com.ahmetocak.multinote.model.NoteType
 import java.io.File
@@ -78,4 +81,14 @@ fun Int.getNoteType(): NoteType {
 fun generateUniqueFileName(): String {
     val date = LocalDateTime.now()
     return "${date.hour}${date.minute}${date.second}${date.year}${date.monthValue}${date.dayOfWeek.value}"
+}
+
+@Composable
+fun getScreenHeight(): Dp {
+    return LocalConfiguration.current.screenHeightDp.dp
+}
+
+@Composable
+fun getScreenWidth(): Dp {
+    return LocalConfiguration.current.screenWidthDp.dp
 }
