@@ -15,6 +15,7 @@ import androidx.compose.ui.platform.LocalDensity
 import com.ahmetocak.multinote.model.NoteTag
 import com.ahmetocak.multinote.model.NoteType
 import java.io.File
+import java.time.LocalDateTime
 
 @Composable
 fun LazyStaggeredGridState.isScrollingUp(): State<Boolean> {
@@ -50,18 +51,18 @@ fun keyboardAsState(): State<Boolean> {
 }
 
 fun Uri.toFile(context: Context, suffix: String): File? {
-    val inputStream = context.contentResolver.openInputStream(this)
-    val tempFile = File.createTempFile("temp", suffix)
     return try {
+        val inputStream = context.contentResolver.openInputStream(this)
+        val tempFile = File.createTempFile("temp", suffix)
         tempFile.outputStream().use { fileOut ->
             inputStream?.copyTo(fileOut)
         }
         tempFile.deleteOnExit()
         inputStream?.close()
-        Log.d("MultiNote App: saved image file path -> ", tempFile.path)
+        Log.d("MultiNote App: saved file path -> ", tempFile.path)
         tempFile
     } catch (e: Exception) {
-        null
+        return this.path?.let { File(it) }
     }
 }
 
@@ -72,4 +73,9 @@ fun Int.getNoteType(): NoteType {
         NoteType.IMAGE.ordinal -> NoteType.IMAGE
         else -> NoteType.TEXT
     }
+}
+
+fun generateUniqueFileName(): String {
+    val date = LocalDateTime.now()
+    return "${date.hour}${date.minute}${date.second}${date.year}${date.monthValue}${date.dayOfWeek.value}"
 }

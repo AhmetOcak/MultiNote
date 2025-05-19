@@ -64,6 +64,7 @@ fun NoteScreen(
                 NoteScreenContent(
                     modifier = modifier,
                     noteData = note,
+                    isAudioPlaying = uiState.isAudioPlaying,
                     onNavigateBack = onNavigateBack,
                     onImageClick = viewModel::onImageClick,
                     onPlayButtonClick = viewModel::onPlayAudioClick
@@ -84,6 +85,7 @@ fun NoteScreen(
 private fun NoteScreenContent(
     modifier: Modifier = Modifier,
     noteData: Note,
+    isAudioPlaying: Boolean,
     onNavigateBack: () -> Unit,
     onImageClick: (String?) -> Unit,
     onPlayButtonClick: (String) -> Unit
@@ -117,47 +119,46 @@ private fun NoteScreenContent(
                 style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
             )
             Text(modifier = Modifier.padding(horizontal = 16.dp), text = noteData.description)
-            Text(
-                modifier = Modifier.padding(horizontal = 16.dp),
-                text = "Media",
-                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
-            )
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                contentPadding = PaddingValues(horizontal = 16.dp)
-            ) {
-                when (noteData.noteType.getNoteType()) {
-                    NoteType.IMAGE -> {
-                        items(noteData.imagePath ?: emptyList(), key = { it }) {
-                            ImageItem(
-                                imagePath = it,
-                                onClick = { onImageClick(it) }
-                            )
+            if (!noteData.imagePath.isNullOrEmpty() || !noteData.audioPath.isNullOrEmpty() || !noteData.videoPath.isNullOrEmpty()) {
+                Text(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    text = "Media",
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+                )
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    contentPadding = PaddingValues(horizontal = 16.dp)
+                ) {
+                    when (noteData.noteType.getNoteType()) {
+                        NoteType.IMAGE -> {
+                            items(noteData.imagePath ?: emptyList(), key = { it }) {
+                                ImageItem(
+                                    imagePath = it,
+                                    onClick = { onImageClick(it) }
+                                )
+                            }
                         }
-                    }
 
-                    NoteType.VIDEO -> {}
-                    NoteType.AUDIO -> {
-                        itemsIndexed(noteData.audioPath ?: emptyList()) { index, content ->
-                            AudioPlayer(
-                                isAudioPlaying = selectedIndex == index,
-                                duration = getAudioDuration(context, Uri.parse(content)),
-                                onPlayButtonClicked = {
-                                    selectedIndex = if (selectedIndex == index)
-                                        -1
-                                    else
-                                        index
-                                    onPlayButtonClick(content)
-                                }
-                            )
+                        NoteType.VIDEO -> {}
+                        NoteType.AUDIO -> {
+                            itemsIndexed(noteData.audioPath ?: emptyList()) { index, content ->
+                                AudioPlayer(
+                                    isAudioPlaying = isAudioPlaying && selectedIndex == index,
+                                    duration = getAudioDuration(context, Uri.parse(content)),
+                                    onPlayButtonClicked = {
+                                        selectedIndex = index
+                                        onPlayButtonClick(content)
+                                    }
+                                )
+                            }
                         }
-                    }
 
-                    else -> {}
+                        else -> {}
+                    }
                 }
             }
         }
@@ -216,6 +217,7 @@ private fun PreviewNoteScreenContent() {
             imagePath = emptyList(),
             videoPath = emptyList()
         ),
+        isAudioPlaying = false,
         onImageClick = {},
         onPlayButtonClick = {_: String ->  }
     )

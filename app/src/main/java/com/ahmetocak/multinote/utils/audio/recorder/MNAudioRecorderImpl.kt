@@ -3,8 +3,8 @@ package com.ahmetocak.multinote.utils.audio.recorder
 import android.content.Context
 import android.media.MediaRecorder
 import android.os.Build
+import com.ahmetocak.multinote.utils.generateUniqueFileName
 import java.io.File
-import java.time.LocalDateTime
 import javax.inject.Inject
 import java.io.FileOutputStream
 
@@ -22,7 +22,7 @@ class MNAudioRecorderImpl @Inject constructor(
     }
 
     override fun startRecording(noteId: Int) {
-        audioFile = File(context.cacheDir, "$noteId${LocalDateTime.now()}.mp3")
+        audioFile = File(context.cacheDir, "$noteId${generateUniqueFileName()}.mp3")
 
         createMediaRecorder().apply {
             setAudioSource(MediaRecorder.AudioSource.MIC)

@@ -2,7 +2,6 @@ package com.ahmetocak.multinote.features.add_new_note
 
 import android.content.Context
 import android.net.Uri
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ahmetocak.multinote.data.repository.note.NotesRepository

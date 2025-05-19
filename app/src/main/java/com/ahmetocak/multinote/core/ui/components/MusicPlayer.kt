@@ -40,7 +40,7 @@ private val PlayStopButtonSize = 56.dp
 @Composable
 fun AudioPlayer(
     modifier: Modifier = Modifier,
-    isAudioPlaying: Boolean = false,
+    isAudioPlaying: Boolean,
     duration: Pair<String, String>,
     onPlayButtonClicked: () -> Unit
 ) {
@@ -73,6 +73,9 @@ fun AudioPlayer(
                     currentAudioPosition = currentAudioPosition,
                     increaseCurrentAudioPosition = {
                         currentAudioPosition += 1
+                    },
+                    resetCurrentPosition = {
+                        currentAudioPosition = 0
                     }
                 )
             }
@@ -83,8 +86,8 @@ fun AudioPlayer(
 @Composable
 private fun PlayerButton(
     modifier: Modifier,
-    onPlayButtonClicked: () -> Unit,
-    isAudioPlaying: Boolean
+    isAudioPlaying: Boolean,
+    onPlayButtonClicked: () -> Unit
 ) {
     IconButton(onClick = onPlayButtonClicked) {
         Icon(
@@ -105,10 +108,18 @@ private fun MusicSlider(
     isAudioPlaying: Boolean,
     audioDuration: Pair<String, String>,
     currentAudioPosition: Int,
-    increaseCurrentAudioPosition: () -> Unit
+    increaseCurrentAudioPosition: () -> Unit,
+    resetCurrentPosition: () -> Unit
 ) {
     LaunchedEffect(isAudioPlaying) {
-        if (isAudioPlaying && currentAudioPosition <= audioDuration.second.toInt()) {
+        val duration = (audioDuration.first.toInt() * 60) + audioDuration.second.toInt()
+        if (isAudioPlaying && currentAudioPosition < duration) {
+            while (true) {
+                delay(1000)
+                increaseCurrentAudioPosition()
+            }
+        } else if (isAudioPlaying) {
+            resetCurrentPosition()
             while (true) {
                 delay(1000)
                 increaseCurrentAudioPosition()

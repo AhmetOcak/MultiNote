@@ -36,7 +36,9 @@ class NoteViewModel @Inject constructor(
         }
 
         audioPlayer.initializeMediaPlayer(onCompletion = {
-            audioPlayer.stop()
+            _uiState.update {
+                it.copy(isAudioPlaying = false)
+            }
         })
     }
 
@@ -70,9 +72,15 @@ class NoteViewModel @Inject constructor(
     fun onPlayAudioClick(audioPath: String) {
         viewModelScope.launch {
             if (audioPlayer.isPlaying()) {
-                audioPlayer.stop()
+                audioPlayer.pause()
+                _uiState.update {
+                    it.copy(isAudioPlaying = false)
+                }
             } else {
                 audioPlayer.play(audioPath)
+                _uiState.update {
+                    it.copy(isAudioPlaying = true)
+                }
             }
         }
     }
@@ -86,6 +94,7 @@ class NoteViewModel @Inject constructor(
 data class NoteUiState(
     val isLoading: Boolean = true,
     val noteData: Note? = null,
+    val isAudioPlaying: Boolean = false,
     val noteScreenState: NoteScreenState = NoteScreenState.Default,
 )
 
