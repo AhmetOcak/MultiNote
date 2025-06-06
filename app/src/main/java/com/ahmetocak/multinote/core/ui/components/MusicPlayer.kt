@@ -1,5 +1,6 @@
 package com.ahmetocak.multinote.core.ui.components
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -22,10 +23,6 @@ import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -41,11 +38,12 @@ private val PlayStopButtonSize = 56.dp
 fun AudioPlayer(
     modifier: Modifier = Modifier,
     isAudioPlaying: Boolean,
+    currentAudioPosition: Int,
     duration: Pair<String, String>,
+    increaseCurrentAudioPosition: () -> Unit,
+    resetCurrentPosition: () -> Unit,
     onPlayButtonClicked: () -> Unit
 ) {
-    var currentAudioPosition by remember { mutableIntStateOf(0) }
-
     ElevatedCard(
         modifier = modifier
             .fillMaxWidth()
@@ -71,12 +69,8 @@ fun AudioPlayer(
                     isAudioPlaying = isAudioPlaying,
                     audioDuration = duration,
                     currentAudioPosition = currentAudioPosition,
-                    increaseCurrentAudioPosition = {
-                        currentAudioPosition += 1
-                    },
-                    resetCurrentPosition = {
-                        currentAudioPosition = 0
-                    }
+                    increaseCurrentAudioPosition = increaseCurrentAudioPosition,
+                    resetCurrentPosition = resetCurrentPosition
                 )
             }
         }

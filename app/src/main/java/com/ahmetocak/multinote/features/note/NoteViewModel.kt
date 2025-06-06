@@ -2,6 +2,7 @@ package com.ahmetocak.multinote.features.note
 
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -35,6 +36,7 @@ class NoteViewModel @Inject constructor(
     private val _playerState = MutableStateFlow<ExoPlayer?>(null)
     val playerState: StateFlow<ExoPlayer?> = _playerState
 
+    // Video
     private var currentPosition: Long = 0L
 
     init {
@@ -87,7 +89,9 @@ class NoteViewModel @Inject constructor(
                     it.copy(isAudioPlaying = false)
                 }
             } else {
-                audioPlayer.play(audioPath)
+                val isSameAudio = audioPlayer.play(audioPath)
+                if (!isSameAudio)
+                    resetCurrentAudioPos()
                 _uiState.update {
                     it.copy(isAudioPlaying = true)
                 }
@@ -162,6 +166,19 @@ class NoteViewModel @Inject constructor(
         }
     }
 
+    fun increaseCurrentAudioPos() {
+        val newVal = _uiState.value.currentAudioPos + 1
+        _uiState.update {
+            it.copy(currentAudioPos = newVal)
+        }
+    }
+
+    fun resetCurrentAudioPos() {
+        _uiState.update {
+            it.copy(currentAudioPos = 0)
+        }
+    }
+
     override fun onCleared() {
         audioPlayer.releaseMediaPlayer()
         super.onCleared()
@@ -172,6 +189,7 @@ data class NoteUiState(
     val isLoading: Boolean = true,
     val noteData: Note? = null,
     val isAudioPlaying: Boolean = false,
+    val currentAudioPos: Int = 0,
     val noteScreenState: NoteScreenState = NoteScreenState.Default,
 )
 

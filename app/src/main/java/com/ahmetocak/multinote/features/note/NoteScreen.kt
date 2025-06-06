@@ -2,6 +2,7 @@ package com.ahmetocak.multinote.features.note
 
 import android.graphics.Bitmap
 import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -72,6 +73,9 @@ fun NoteScreen(
                     noteData = note,
                     isAudioPlaying = uiState.isAudioPlaying,
                     onNavigateBack = onNavigateBack,
+                    currentAudioPos = uiState.currentAudioPos,
+                    increaseCurrAudioPos = viewModel::increaseCurrentAudioPos,
+                    resetCurrAudioPos = viewModel::resetCurrentAudioPos,
                     onImageClick = viewModel::onImageClick,
                     onPlayButtonClick = viewModel::onPlayAudioClick,
                     onVideoClick = viewModel::onVideoItemClicked
@@ -98,6 +102,9 @@ private fun NoteScreenContent(
     modifier: Modifier = Modifier,
     noteData: Note,
     isAudioPlaying: Boolean,
+    currentAudioPos: Int,
+    increaseCurrAudioPos: () -> Unit,
+    resetCurrAudioPos: () -> Unit,
     onNavigateBack: () -> Unit,
     onImageClick: (String?) -> Unit,
     onPlayButtonClick: (String) -> Unit,
@@ -167,9 +174,14 @@ private fun NoteScreenContent(
                                 AudioPlayer(
                                     isAudioPlaying = isAudioPlaying && selectedIndex == index,
                                     duration = getAudioDuration(context, Uri.parse(content)),
+                                    currentAudioPosition = if (selectedIndex == index)
+                                        currentAudioPos
+                                    else 0,
+                                    increaseCurrentAudioPosition = increaseCurrAudioPos,
+                                    resetCurrentPosition = resetCurrAudioPos,
                                     onPlayButtonClicked = {
-                                        selectedIndex = index
                                         onPlayButtonClick(content)
+                                        selectedIndex = index
                                     }
                                 )
                             }
@@ -260,6 +272,9 @@ private fun PreviewNoteScreenContent() {
             videoPath = emptyList()
         ),
         isAudioPlaying = false,
+        currentAudioPos = 0,
+        increaseCurrAudioPos = {},
+        resetCurrAudioPos = {},
         onImageClick = {},
         onPlayButtonClick = { _: String -> },
         onVideoClick = {}

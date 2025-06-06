@@ -9,6 +9,7 @@ class MNAudioPlayerImpl @Inject constructor() : AudioPlayer {
 
     private var mediaPlayer: MediaPlayer? = null
     private var isMediaEnded: Boolean = true
+    private var currentAudio: String? = null
 
     override fun initializeMediaPlayer(onCompletion: () -> Unit) {
         try {
@@ -29,9 +30,12 @@ class MNAudioPlayerImpl @Inject constructor() : AudioPlayer {
         }
     }
 
-    override fun play(audioUrl: String) {
+    override fun play(audioUrl: String): Boolean {
+        if (currentAudio == null)
+            currentAudio = audioUrl
+        val returnVal = audioUrl == currentAudio
         try {
-            if (isMediaEnded) {
+            if (audioUrl != currentAudio) {
                 mediaPlayer!!.apply {
                     stop()
                     reset()
@@ -41,10 +45,24 @@ class MNAudioPlayerImpl @Inject constructor() : AudioPlayer {
                 }
                 isMediaEnded = false
             } else {
-                mediaPlayer!!.start()
+                if (isMediaEnded) {
+                    mediaPlayer!!.apply {
+                        stop()
+                        reset()
+                        setDataSource(audioUrl)
+                        prepare()
+                        start()
+                    }
+                    isMediaEnded = false
+                } else {
+                    mediaPlayer!!.start()
+                }
             }
+            currentAudio = audioUrl
+            return returnVal
         } catch (e: Exception) {
             Log.e("MNAudioPlayerImpl", e.stackTraceToString())
+            return returnVal
         }
     }
 
