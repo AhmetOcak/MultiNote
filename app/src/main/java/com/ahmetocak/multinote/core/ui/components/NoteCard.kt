@@ -1,13 +1,12 @@
 package com.ahmetocak.multinote.core.ui.components
 
+import android.graphics.Bitmap
 import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -18,7 +17,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
@@ -27,8 +26,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
-import coil.request.ImageRequest
 import com.ahmetocak.multinote.R
 import com.ahmetocak.multinote.utils.getScreenHeight
 import com.ahmetocak.multinote.utils.getVideoThumbnail
@@ -67,12 +64,9 @@ fun ImageNoteCard(title: String, description: String, imagePath: String?, onClic
             modifier = Modifier.padding(bottom = 16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            AsyncImage(
+            MNImage(
                 modifier = Modifier.fillMaxWidth().heightIn(max = getScreenHeight() / 3.5f),
-                model = ImageRequest.Builder(LocalContext.current)
-                    .data(imagePath)
-                    .build(),
-                contentDescription = null,
+                imagePath = imagePath,
                 contentScale = ContentScale.Fit
             )
             NoteTitle(title)
@@ -115,11 +109,13 @@ fun AudioNoteCard(title: String, description: String, onClick: () -> Unit) {
 @Composable
 fun VideoNoteCard(title: String, description: String, videoPath: String?, onClick: () -> Unit) {
     val context = LocalContext.current
-    val bitmap = if (videoPath != null) {
-        remember(videoPath) {
+    var bitmap: Bitmap? = null
+
+    LaunchedEffect(true) {
+        bitmap = if (videoPath != null) {
             getVideoThumbnail(context, Uri.parse(videoPath))
-        }
-    } else null
+        } else null
+    }
 
     Card(modifier = Modifier.fillMaxWidth(), onClick = onClick) {
         Column(
@@ -128,12 +124,12 @@ fun VideoNoteCard(title: String, description: String, videoPath: String?, onClic
         ) {
             videoPath?.let {
                 bitmap?.asImageBitmap()?.let { it1 ->
-                    Box(modifier = Modifier.heightIn(max = getScreenHeight() / 3)) {
+                    Box(modifier = Modifier.fillMaxWidth().heightIn(max = getScreenHeight() / 3)) {
                         Image(
                             modifier = Modifier.fillMaxWidth(),
                             bitmap = it1,
                             contentDescription = null,
-                            contentScale = ContentScale.Fit
+                            contentScale = ContentScale.Crop
                         )
                     }
                 }
