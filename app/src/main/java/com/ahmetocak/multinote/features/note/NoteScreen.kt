@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -55,7 +54,6 @@ import com.ahmetocak.multinote.model.NoteTag
 import com.ahmetocak.multinote.model.NoteType
 import com.ahmetocak.multinote.utils.getAudioDuration
 import com.ahmetocak.multinote.utils.getNoteType
-import com.ahmetocak.multinote.utils.getScreenHeight
 import com.ahmetocak.multinote.utils.getVideoThumbnail
 
 @Composable
@@ -75,7 +73,8 @@ fun NoteScreen(
                     isAudioPlaying = uiState.isAudioPlaying,
                     onNavigateBack = onNavigateBack,
                     onImageClick = viewModel::onImageClick,
-                    onPlayButtonClick = viewModel::onPlayAudioClick
+                    onPlayButtonClick = viewModel::onPlayAudioClick,
+                    onVideoClick = viewModel::onVideoItemClicked
                 )
             } ?: {
                 // TODO: SHOW ERROR SCREEN
@@ -85,6 +84,11 @@ fun NoteScreen(
         is NoteScreenState.FullScreenImage -> FullScreenImage(
             imagePath = state.imagePath,
             onBackClick = viewModel::resetScreenState
+        )
+
+        is NoteScreenState.VideoState -> VideoPlayer(
+            videoPath = state.videoPath,
+            viewModel = viewModel
         )
     }
 }
@@ -96,7 +100,8 @@ private fun NoteScreenContent(
     isAudioPlaying: Boolean,
     onNavigateBack: () -> Unit,
     onImageClick: (String?) -> Unit,
-    onPlayButtonClick: (String) -> Unit
+    onPlayButtonClick: (String) -> Unit,
+    onVideoClick: (String) -> Unit
 ) {
     var selectedIndex by remember { mutableIntStateOf(-1) }
     val context = LocalContext.current
@@ -152,8 +157,8 @@ private fun NoteScreenContent(
                         }
 
                         NoteType.VIDEO -> {
-                            itemsIndexed(noteData.videoPath ?: emptyList()) { index, item ->
-                                VideoItem(videoPath = item, onClick = {})
+                            itemsIndexed(noteData.videoPath ?: emptyList()) { _, item ->
+                                VideoItem(videoPath = item, onClick = { onVideoClick(item) })
                             }
                         }
 
@@ -256,6 +261,7 @@ private fun PreviewNoteScreenContent() {
         ),
         isAudioPlaying = false,
         onImageClick = {},
-        onPlayButtonClick = {_: String ->  }
+        onPlayButtonClick = { _: String -> },
+        onVideoClick = {}
     )
 }
