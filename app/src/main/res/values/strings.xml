@@ -11,4 +11,7 @@
     <string name="edit">Edit</string>
     <string name="archive">Archive</string>
     <string name="delete">Delete</string>
+    <string name="cancel">Cancel</string>
+    <string name="delete_warning">Are you sure you want to delete? This action cannot be undone.</string>
+    <string name="delete_note">Delete Note</string>
 </resources>

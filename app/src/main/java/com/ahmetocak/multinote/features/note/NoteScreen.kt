@@ -52,6 +52,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ahmetocak.multinote.R
 import com.ahmetocak.multinote.core.ui.components.AudioPlayer
+import com.ahmetocak.multinote.core.ui.components.DeleteWarning
 import com.ahmetocak.multinote.core.ui.components.MNImage
 import com.ahmetocak.multinote.core.ui.components.MNTopBar
 import com.ahmetocak.multinote.core.ui.components.MNZoomableImage
@@ -72,6 +73,17 @@ fun NoteScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var expanded by remember { mutableStateOf(false) }
+    var showDeleteWarning by remember { mutableStateOf(false) }
+
+    if (showDeleteWarning) {
+        DeleteWarning(
+            title = stringResource(R.string.delete_note),
+            onDismissRequest = { showDeleteWarning = false },
+            onConfirm = {
+                viewModel.deleteNote(onNavigateBack)
+            }
+        )
+    }
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -104,9 +116,7 @@ fun NoteScreen(
                         onEdit = { onEditClick.invoke(note.id) },
                         onArchive = {},
                         onDelete = {
-                            viewModel.deleteNote {
-                                onNavigateBack.invoke()
-                            }
+                            showDeleteWarning = true
                         }
                     )
                     NoteScreenContent(

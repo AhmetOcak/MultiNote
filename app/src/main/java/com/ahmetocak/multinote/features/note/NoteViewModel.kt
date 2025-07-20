@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -176,7 +177,9 @@ class NoteViewModel @Inject constructor(
     fun deleteNote(onNoteDeleted: () -> Unit) {
         viewModelScope.launch(Dispatchers.IO) {
             _uiState.value.noteData?.id?.let { notesRepository.deleteNote(it) }
-            onNoteDeleted()
+            withContext(Dispatchers.Main) {
+                onNoteDeleted()
+            }
         }
     }
 
