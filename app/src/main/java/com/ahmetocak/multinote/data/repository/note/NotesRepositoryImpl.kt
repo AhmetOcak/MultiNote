@@ -16,14 +16,7 @@ class NotesRepositoryImpl @Inject constructor(
 
     override suspend fun deleteNote(id: Int) = notesLocalDataSource.deleteNote(id)
 
-    override suspend fun updateNote(
-        id: Int,
-        title: String,
-        description: String,
-        imagePath: String?,
-        audioPath: String?,
-        tag: Int
-    ) {
-        return notesLocalDataSource.updateNote(id, title, description, imagePath, audioPath, tag)
+    override suspend fun updateNote(note: Note) {
+        return notesLocalDataSource.updateNote(note)
     }
 }

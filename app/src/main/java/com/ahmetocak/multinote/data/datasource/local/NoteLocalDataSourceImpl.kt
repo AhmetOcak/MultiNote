@@ -16,16 +16,7 @@ class NoteLocalDataSourceImpl @Inject constructor(
 
     override suspend fun deleteNote(id: Int) = notesDao.deleteNote(id)
 
-    override suspend fun updateNote(
-        id: Int,
-        title: String,
-        description: String,
-        imagePath: String?,
-        audioPath: String?,
-        tag: Int
-    ) {
-        return notesDao.updateNote(
-            id, title, description, imagePath, audioPath, tag
-        )
+    override suspend fun updateNote(note: Note) {
+        return notesDao.updateNote(note)
     }
 }

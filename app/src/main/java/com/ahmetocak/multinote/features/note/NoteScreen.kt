@@ -2,6 +2,7 @@ package com.ahmetocak.multinote.features.note
 
 import android.graphics.Bitmap
 import android.net.Uri
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -17,8 +18,14 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Archive
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Card
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -36,11 +43,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.ahmetocak.multinote.R
 import com.ahmetocak.multinote.core.ui.components.AudioPlayer
 import com.ahmetocak.multinote.core.ui.components.MNImage
 import com.ahmetocak.multinote.core.ui.components.MNTopBar
@@ -57,9 +67,11 @@ import com.ahmetocak.multinote.utils.getVideoThumbnail
 fun NoteScreen(
     modifier: Modifier = Modifier,
     onNavigateBack: () -> Unit,
+    onEditClick: (Int) -> Unit,
     viewModel: NoteViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    var expanded by remember { mutableStateOf(false) }
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -74,7 +86,7 @@ fun NoteScreen(
                 },
                 actions = {
                     if (uiState.noteScreenState is NoteScreenState.Default) {
-                        IconButton(onClick = {/*TODO: OPEN ACTIONS*/ }) {
+                        IconButton(onClick = { expanded = !expanded }) {
                             Icon(imageVector = Icons.Default.Menu, contentDescription = null)
                         }
                     }
@@ -85,6 +97,18 @@ fun NoteScreen(
         when (val state = uiState.noteScreenState) {
             is NoteScreenState.Default -> {
                 uiState.noteData?.let { note ->
+                    MenuSection(
+                        padding = innerPadding,
+                        expanded = expanded,
+                        onDismiss = { expanded = false },
+                        onEdit = { onEditClick.invoke(note.id) },
+                        onArchive = {},
+                        onDelete = {
+                            viewModel.deleteNote {
+                                onNavigateBack.invoke()
+                            }
+                        }
+                    )
                     NoteScreenContent(
                         modifier = modifier.padding(innerPadding),
                         noteData = note,
@@ -97,7 +121,7 @@ fun NoteScreen(
                         onVideoClick = viewModel::onVideoItemClicked
                     )
                 } ?: {
-                    // TODO: SHOW ERROR SCREEN
+
                 }
             }
 
@@ -239,6 +263,65 @@ private fun VideoItem(videoPath: String?, onClick: () -> Unit) {
                     bitmap = it1,
                     contentDescription = null,
                     contentScale = ContentScale.FillBounds
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun MenuSection(
+    padding: PaddingValues,
+    expanded: Boolean,
+    onDismiss: () -> Unit,
+    onDelete: () -> Unit,
+    onArchive: () -> Unit,
+    onEdit: () -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .padding(padding)
+            .padding(end = 16.dp, bottom = 8.dp)
+            .fillMaxWidth()
+            .zIndex(1f),
+        contentAlignment = Alignment.CenterEnd
+    ) {
+        AnimatedVisibility(visible = expanded) {
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = onDismiss
+            ) {
+                DropdownMenuItem(
+                    text = { Text(text = stringResource(R.string.edit)) },
+                    leadingIcon = {
+                        Icon(imageVector = Icons.Default.Edit, contentDescription = null)
+                    },
+                    onClick = onEdit
+                )
+                DropdownMenuItem(
+                    text = { Text(text = stringResource(R.string.archive)) },
+                    leadingIcon = {
+                        Icon(imageVector = Icons.Default.Archive, contentDescription = null)
+                    },
+                    onClick = onArchive
+                )
+                HorizontalDivider()
+                DropdownMenuItem(
+                    text = {
+                        Text(
+                            text = stringResource(R.string.delete),
+                            color = MaterialTheme.colorScheme.error,
+                            fontWeight = FontWeight.Bold
+                        )
+                    },
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.Delete,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.error
+                        )
+                    },
+                    onClick = onDelete
                 )
             }
         }

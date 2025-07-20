@@ -4,7 +4,6 @@ import android.Manifest
 import android.content.Context
 import android.net.Uri
 import android.os.Build
-import android.os.Environment
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -191,6 +190,7 @@ fun AddNewNoteScreen(
 
     AddNewNoteScreenContent(
         modifier = modifier,
+        noteStatus = uiState.noteStatus,
         titleValue = uiState.titleValue,
         descriptionValue = uiState.descriptionValue,
         selectedNoteType = uiState.selectedNoteType,
@@ -268,6 +268,7 @@ fun AddNewNoteScreen(
 @Composable
 private fun AddNewNoteScreenContent(
     modifier: Modifier = Modifier,
+    noteStatus: NoteStatus,
     titleValue: String,
     descriptionValue: String,
     selectedNoteType: NoteType,
@@ -290,7 +291,7 @@ private fun AddNewNoteScreenContent(
         modifier = modifier.fillMaxSize(),
         topBar = {
             MNTopBar(
-                title = "Create Note",
+                title = if (noteStatus == NoteStatus.CREATE) "Create Note" else "Update Note",
                 onNavigateBack = onNavigateUpClick
             )
         }
@@ -414,8 +415,15 @@ private fun AddNewNoteScreenContent(
             Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterEnd) {
                 Button(
                     enabled = isSaveReady,
-                    onClick = { onEvent(AddNewNoteUiEvent.OnSaveNoteClick(context = context)) }) {
-                    Text(text = "Save")
+                    onClick = {
+                        onEvent(
+                            AddNewNoteUiEvent.OnSaveNoteClick(
+                                context = context,
+                                onNavBack = onNavigateUpClick
+                            )
+                        )
+                    }) {
+                    Text(text = if (noteStatus == NoteStatus.CREATE) "Save" else "Update")
                 }
             }
 
@@ -736,6 +744,7 @@ private fun VideoItem(content: Uri, context: Context) {
 private fun PreviewAddNewNoteScreen() {
     AddNewNoteScreenContent(
         titleValue = "",
+        noteStatus = NoteStatus.CREATE,
         descriptionValue = "",
         selectedNoteType = NoteType.TEXT,
         selectedNoteTag = NoteTag.NONE,

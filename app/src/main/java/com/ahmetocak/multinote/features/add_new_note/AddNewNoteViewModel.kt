@@ -2,8 +2,11 @@ package com.ahmetocak.multinote.features.add_new_note
 
 import android.content.Context
 import android.net.Uri
+import android.util.Log
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ahmetocak.multinote.core.navigation.Arguments
 import com.ahmetocak.multinote.data.repository.note.NotesRepository
 import com.ahmetocak.multinote.model.Note
 import com.ahmetocak.multinote.model.NoteTag
@@ -16,18 +19,33 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
 class AddNewNoteViewModel @Inject constructor(
     private val audioRecorder: AudioRecorder,
-    private val notesRepository: NotesRepository
+    private val notesRepository: NotesRepository,
+    savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AddNewNoteUiState())
     val uiState: StateFlow<AddNewNoteUiState> = _uiState.asStateFlow()
+
+    // Use only update status
+    private var noteId: String? = null
+
+    init {
+        noteId = savedStateHandle.get<String>(Arguments.NOTE_ID)
+        noteId?.let {
+            if (it.toInt() > 0) {
+                loadNoteData(it.toInt())
+            }
+        }
+    }
 
     fun onEvent(event: AddNewNoteUiEvent) {
         when (event) {
@@ -102,7 +120,10 @@ class AddNewNoteViewModel @Inject constructor(
                 }
             }
 
-            is AddNewNoteUiEvent.OnSaveNoteClick -> addNote(context = event.context)
+            is AddNewNoteUiEvent.OnSaveNoteClick -> addNote(
+                context = event.context,
+                onNavBack = event.onNavBack
+            )
 
             is AddNewNoteUiEvent.OnRemoveMediaClick -> removeMedia(index = event.index)
         }
@@ -180,37 +201,100 @@ class AddNewNoteViewModel @Inject constructor(
         }
     }
 
-    private fun addNote(context: Context) {
+    private fun addNote(context: Context, onNavBack: () -> Unit) {
         viewModelScope.launch(Dispatchers.IO) {
             val state = _uiState.value
             try {
-                val result = notesRepository.addNote(
-                    note = Note(
-                        title = state.titleValue,
-                        description = state.descriptionValue,
-                        tag = state.selectedNoteTag.ordinal,
-                        noteType = state.selectedNoteType.ordinal,
-                        audioPath = state.selectedAudios.map { it.toFile(context, ".mp3")?.path ?: "" },
-                        imagePath = state.selectedImages.map { it.toFile(context, ".jpg")?.path ?: "" },
-                        videoPath = state.selectedVideos.map { it.toFile(context, ".mp4")?.path ?: "" }
+                if (_uiState.value.noteStatus == NoteStatus.CREATE) {
+                    val result = notesRepository.addNote(
+                        note = Note(
+                            title = state.titleValue,
+                            description = state.descriptionValue,
+                            tag = state.selectedNoteTag.ordinal,
+                            noteType = state.selectedNoteType.ordinal,
+                            audioPath = state.selectedAudios.map {
+                                it.toFile(context, ".mp3")?.path ?: ""
+                            },
+                            imagePath = state.selectedImages.map {
+                                it.toFile(context, ".jpg")?.path ?: ""
+                            },
+                            videoPath = state.selectedVideos.map {
+                                it.toFile(context, ".mp4")?.path ?: ""
+                            }
+                        )
                     )
-                )
 
-                if (result != -1L && result >= 0L) {
-                    _uiState.update {
-                        it.copy(showSaveNoteSuccessMessage = true)
+                    if (result != -1L && result >= 0L) {
+                        _uiState.update {
+                            it.copy(showSaveNoteSuccessMessage = true)
+                        }
                     }
-                }
 
-                viewModelScope.launch {
-                    delay(3000)
-                    _uiState.update {
-                        it.copy(showSaveNoteSuccessMessage = false)
+                    viewModelScope.launch {
+                        delay(3000)
+                        _uiState.update {
+                            it.copy(showSaveNoteSuccessMessage = false)
+                        }
+                    }
+                } else {
+                    notesRepository.updateNote(
+                        note = Note(
+                            id = noteId!!.toInt(),
+                            title = state.titleValue,
+                            description = state.descriptionValue,
+                            tag = state.selectedNoteTag.ordinal,
+                            noteType = state.selectedNoteType.ordinal,
+                            audioPath = state.selectedAudios.map {
+                                it.toFile(context, ".mp3")?.path ?: ""
+                            },
+                            imagePath = state.selectedImages.map {
+                                it.toFile(context, ".jpg")?.path ?: ""
+                            },
+                            videoPath = state.selectedVideos.map {
+                                it.toFile(context, ".mp4")?.path ?: ""
+                            }
+                        )
+                    )
+                    viewModelScope.launch {
+                        delay(1500)
+                        _uiState.update {
+                            it.copy(showSaveNoteSuccessMessage = false)
+                        }
+                    }
+                    withContext(Dispatchers.Main) {
+                        onNavBack.invoke()
                     }
                 }
                 resetAllData()
             } catch (e: Exception) {
                 e.printStackTrace()
+            }
+        }
+    }
+
+    private fun loadNoteData(noteId: Int) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val noteData = notesRepository.getNoteById(noteId).first()
+            if (noteData != null) {
+                _uiState.update {
+                    it.copy(
+                        selectedAudios = noteData.audioPath?.map { path -> Uri.parse(path) }
+                            ?: emptyList(),
+                        selectedVideos = noteData.videoPath?.map { path -> Uri.parse(path) }
+                            ?: emptyList(),
+                        selectedImages = noteData.imagePath?.map { path -> Uri.parse(path) }
+                            ?: emptyList(),
+                        selectedNoteType = NoteType.entries
+                            .find { type -> type.ordinal == noteData.noteType } ?: NoteType.TEXT,
+                        selectedNoteTag = NoteTag.entries
+                            .find { tag -> tag.ordinal == noteData.tag } ?: NoteTag.NONE,
+                        descriptionValue = noteData.description,
+                        titleValue = noteData.title,
+                        noteStatus = NoteStatus.UPDATE
+                    )
+                }
+            } else {
+                Log.e("Note Data Null", "Current status update but there is no note data")
             }
         }
     }
@@ -240,7 +324,8 @@ data class AddNewNoteUiState(
     val selectedAudios: List<Uri> = emptyList(),
     val hideSheet: Boolean = false,
     val showSaveNoteSuccessMessage: Boolean = false,
-    val audioRecordStatus: AudioRecordStatus = AudioRecordStatus.IDLE
+    val audioRecordStatus: AudioRecordStatus = AudioRecordStatus.IDLE,
+    val noteStatus: NoteStatus = NoteStatus.CREATE
 )
 
 sealed class AddNewNoteUiEvent {
@@ -249,7 +334,9 @@ sealed class AddNewNoteUiEvent {
     data class OnTitleValueChange(val value: String) : AddNewNoteUiEvent()
     data class OnDescriptionValueChange(val value: String) : AddNewNoteUiEvent()
     data object OnRecordAudioClick : AddNewNoteUiEvent()
-    data class OnSaveNoteClick(val context: Context)  : AddNewNoteUiEvent()
+    data class OnSaveNoteClick(val context: Context, val onNavBack: () -> Unit) :
+        AddNewNoteUiEvent()
+
     data class OnRemoveMediaClick(val index: Int) : AddNewNoteUiEvent()
 }
 
@@ -261,4 +348,9 @@ sealed interface AudioRecordStatus {
 sealed interface AudioPlayStatus {
     data object PLAYING : AudioPlayStatus
     data object IDLE : AudioPlayStatus
+}
+
+sealed interface NoteStatus {
+    data object CREATE : NoteStatus
+    data object UPDATE : NoteStatus
 }

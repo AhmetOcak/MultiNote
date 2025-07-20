@@ -8,4 +8,7 @@
     <string name="rate_app">Rate App</string>
     <string name="share_app">Share App</string>
     <string name="themes">Themes</string>
+    <string name="edit">Edit</string>
+    <string name="archive">Archive</string>
+    <string name="delete">Delete</string>
 </resources>

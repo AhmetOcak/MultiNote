@@ -2,7 +2,6 @@ package com.ahmetocak.multinote.features.note
 
 import android.content.Context
 import android.net.Uri
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -160,11 +159,6 @@ class NoteViewModel @Inject constructor(
         }
     }
 
-    fun onBackClickedInVideoState() {
-        _uiState.update {
-            it.copy(noteScreenState = NoteScreenState.Default)
-        }
-    }
 
     fun increaseCurrentAudioPos() {
         val newVal = _uiState.value.currentAudioPos + 1
@@ -176,6 +170,13 @@ class NoteViewModel @Inject constructor(
     fun resetCurrentAudioPos() {
         _uiState.update {
             it.copy(currentAudioPos = 0)
+        }
+    }
+
+    fun deleteNote(onNoteDeleted: () -> Unit) {
+        viewModelScope.launch(Dispatchers.IO) {
+            _uiState.value.noteData?.id?.let { notesRepository.deleteNote(it) }
+            onNoteDeleted()
         }
     }
 

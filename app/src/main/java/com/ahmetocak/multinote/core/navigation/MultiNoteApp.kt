@@ -54,14 +54,14 @@ private fun NavGraphBuilder.navGraph(
     isDarkThemeChecked: Boolean,
     isDynamicColorChecked: Boolean,
     currentScheme: CustomColorScheme,
-    onCreateNoteClick: (NavBackStackEntry) -> Unit,
+    onCreateNoteClick: (NavBackStackEntry, Int?) -> Unit,
     onSettingsClick: (NavBackStackEntry) -> Unit,
     onCardClick: (NavBackStackEntry, Int) -> Unit,
     onNavigateUpClick: () -> Unit
 ) {
     composable(route = Destinations.HOME_ROUTE) {
         HomeScreen(
-            onCreateNoteClick = { onCreateNoteClick(it) },
+            onCreateNoteClick = { onCreateNoteClick(it, -1) },
             onSettingsClick = { onSettingsClick(it) },
             onCardClick = { id -> onCardClick(it, id) }
         )
@@ -74,7 +74,11 @@ private fun NavGraphBuilder.navGraph(
             currentScheme = currentScheme
         )
     }
-    composable(route = Destinations.CREATE_NOTE_ROUTE) {
+    composable(route = "${Destinations.CREATE_NOTE_ROUTE}/{${Arguments.NOTE_ID}}",
+        arguments = listOf(
+            navArgument(Arguments.NOTE_ID) { NavType.IntType }
+        )
+    ) {
         AddNewNoteScreen(onNavigateUpClick = onNavigateUpClick)
     }
     composable(
@@ -83,6 +87,9 @@ private fun NavGraphBuilder.navGraph(
             navArgument(Arguments.NOTE_ID) { NavType.IntType }
         )
     ) {
-        NoteScreen(onNavigateBack = onNavigateUpClick)
+        NoteScreen(
+            onNavigateBack = onNavigateUpClick,
+            onEditClick = { id -> onCreateNoteClick(it, id) }
+        )
     }
 }

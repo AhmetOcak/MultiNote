@@ -8,12 +8,5 @@ interface NotesRepository {
     fun observeNotes(): Flow<List<Note>>
     suspend fun getNoteById(id: Int): Flow<Note?>
     suspend fun deleteNote(id: Int)
-    suspend fun updateNote(
-        id: Int,
-        title: String,
-        description: String,
-        imagePath: String?,
-        audioPath: String?,
-        tag: Int
-    )
+    suspend fun updateNote(note: Note)
 }

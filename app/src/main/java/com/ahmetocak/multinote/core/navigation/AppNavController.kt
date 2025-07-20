@@ -34,9 +34,9 @@ class AppNavController(val navController: NavHostController) {
         }
     }
 
-    fun navigateCreateNote(from: NavBackStackEntry) {
+    fun navigateCreateNote(from: NavBackStackEntry, noteId: Int?) {
         if (shouldNavigate(from)) {
-            navController.navigate(Destinations.CREATE_NOTE_ROUTE)
+            navController.navigate("${Destinations.CREATE_NOTE_ROUTE}/$noteId")
         }
     }
 }
