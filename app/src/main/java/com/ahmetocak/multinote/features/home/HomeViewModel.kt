@@ -10,6 +10,7 @@ import com.ahmetocak.multinote.data.repository.note.NotesRepository
 import com.ahmetocak.multinote.model.Note
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -95,6 +96,7 @@ class HomeViewModel @Inject constructor(
                     _uiState.update { it.copy(screenState = HomeScreenState.Idle) }
                 }
                 .collect { noteList ->
+                    delay(1000)
                     _uiState.update {
                         it.copy(screenState = HomeScreenState.Idle, noteList = noteList)
                     }

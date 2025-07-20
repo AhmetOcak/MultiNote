@@ -2,7 +2,6 @@ package com.ahmetocak.multinote.features.note
 
 import android.graphics.Bitmap
 import android.net.Uri
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -12,14 +11,12 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
@@ -42,7 +39,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ahmetocak.multinote.core.ui.components.AudioPlayer
@@ -65,35 +61,57 @@ fun NoteScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    when (val state = uiState.noteScreenState) {
-        is NoteScreenState.Default -> {
-            uiState.noteData?.let { note ->
-                NoteScreenContent(
-                    modifier = modifier,
-                    noteData = note,
-                    isAudioPlaying = uiState.isAudioPlaying,
-                    onNavigateBack = onNavigateBack,
-                    currentAudioPos = uiState.currentAudioPos,
-                    increaseCurrAudioPos = viewModel::increaseCurrentAudioPos,
-                    resetCurrAudioPos = viewModel::resetCurrentAudioPos,
-                    onImageClick = viewModel::onImageClick,
-                    onPlayButtonClick = viewModel::onPlayAudioClick,
-                    onVideoClick = viewModel::onVideoItemClicked
-                )
-            } ?: {
-                // TODO: SHOW ERROR SCREEN
-            }
+    Scaffold(
+        modifier = modifier.fillMaxSize(),
+        topBar = {
+            MNTopBar(
+                onNavigateBack = {
+                    if (uiState.noteScreenState is NoteScreenState.Default) {
+                        onNavigateBack.invoke()
+                    } else {
+                        viewModel.resetScreenState()
+                    }
+                },
+                actions = {
+                    if (uiState.noteScreenState is NoteScreenState.Default) {
+                        IconButton(onClick = {/*TODO: OPEN ACTIONS*/ }) {
+                            Icon(imageVector = Icons.Default.Menu, contentDescription = null)
+                        }
+                    }
+                }
+            )
         }
+    ) { innerPadding ->
+        when (val state = uiState.noteScreenState) {
+            is NoteScreenState.Default -> {
+                uiState.noteData?.let { note ->
+                    NoteScreenContent(
+                        modifier = modifier.padding(innerPadding),
+                        noteData = note,
+                        isAudioPlaying = uiState.isAudioPlaying,
+                        currentAudioPos = uiState.currentAudioPos,
+                        increaseCurrAudioPos = viewModel::increaseCurrentAudioPos,
+                        resetCurrAudioPos = viewModel::resetCurrentAudioPos,
+                        onImageClick = viewModel::onImageClick,
+                        onPlayButtonClick = viewModel::onPlayAudioClick,
+                        onVideoClick = viewModel::onVideoItemClicked
+                    )
+                } ?: {
+                    // TODO: SHOW ERROR SCREEN
+                }
+            }
 
-        is NoteScreenState.FullScreenImage -> FullScreenImage(
-            imagePath = state.imagePath,
-            onBackClick = viewModel::resetScreenState
-        )
+            is NoteScreenState.FullScreenImage -> FullScreenImage(
+                modifier = modifier.padding(innerPadding),
+                imagePath = state.imagePath
+            )
 
-        is NoteScreenState.VideoState -> VideoPlayer(
-            videoPath = state.videoPath,
-            viewModel = viewModel
-        )
+            is NoteScreenState.VideoState -> VideoPlayer(
+                modifier = modifier.padding(innerPadding),
+                videoPath = state.videoPath,
+                viewModel = viewModel
+            )
+        }
     }
 }
 
@@ -105,7 +123,6 @@ private fun NoteScreenContent(
     currentAudioPos: Int,
     increaseCurrAudioPos: () -> Unit,
     resetCurrAudioPos: () -> Unit,
-    onNavigateBack: () -> Unit,
     onImageClick: (String?) -> Unit,
     onPlayButtonClick: (String) -> Unit,
     onVideoClick: (String) -> Unit
@@ -113,82 +130,67 @@ private fun NoteScreenContent(
     var selectedIndex by remember { mutableIntStateOf(-1) }
     val context = LocalContext.current
 
-    Scaffold(
-        modifier = modifier.fillMaxSize(),
-        topBar = {
-            MNTopBar(
-                onNavigateBack = onNavigateBack,
-                actions = {
-                    IconButton(onClick = {/*TODO: OPEN ACTIONS*/ }) {
-                        Icon(imageVector = Icons.Default.Menu, contentDescription = null)
-                    }
-                }
-            )
-        }
-    ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .padding(innerPadding),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState()),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        Text(
+            modifier = Modifier.padding(horizontal = 16.dp),
+            text = noteData.title,
+            style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
+        )
+        Text(modifier = Modifier.padding(horizontal = 16.dp), text = noteData.description)
+        if (!noteData.imagePath.isNullOrEmpty() || !noteData.audioPath.isNullOrEmpty() || !noteData.videoPath.isNullOrEmpty()) {
             Text(
                 modifier = Modifier.padding(horizontal = 16.dp),
-                text = noteData.title,
-                style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
+                text = "Media",
+                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
             )
-            Text(modifier = Modifier.padding(horizontal = 16.dp), text = noteData.description)
-            if (!noteData.imagePath.isNullOrEmpty() || !noteData.audioPath.isNullOrEmpty() || !noteData.videoPath.isNullOrEmpty()) {
-                Text(
-                    modifier = Modifier.padding(horizontal = 16.dp),
-                    text = "Media",
-                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
-                )
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                    contentPadding = PaddingValues(horizontal = 16.dp)
-                ) {
-                    when (noteData.noteType.getNoteType()) {
-                        NoteType.IMAGE -> {
-                            items(noteData.imagePath ?: emptyList(), key = { it }) {
-                                ImageItem(
-                                    imagePath = it,
-                                    onClick = { onImageClick(it) }
-                                )
-                            }
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                contentPadding = PaddingValues(horizontal = 16.dp)
+            ) {
+                when (noteData.noteType.getNoteType()) {
+                    NoteType.IMAGE -> {
+                        items(noteData.imagePath ?: emptyList(), key = { it }) {
+                            ImageItem(
+                                imagePath = it,
+                                onClick = { onImageClick(it) }
+                            )
                         }
-
-                        NoteType.VIDEO -> {
-                            itemsIndexed(noteData.videoPath ?: emptyList()) { _, item ->
-                                VideoItem(videoPath = item, onClick = { onVideoClick(item) })
-                            }
-                        }
-
-                        NoteType.AUDIO -> {
-                            itemsIndexed(noteData.audioPath ?: emptyList()) { index, content ->
-                                AudioPlayer(
-                                    isAudioPlaying = isAudioPlaying && selectedIndex == index,
-                                    duration = getAudioDuration(context, Uri.parse(content)),
-                                    currentAudioPosition = if (selectedIndex == index)
-                                        currentAudioPos
-                                    else 0,
-                                    increaseCurrentAudioPosition = increaseCurrAudioPos,
-                                    resetCurrentPosition = resetCurrAudioPos,
-                                    onPlayButtonClicked = {
-                                        onPlayButtonClick(content)
-                                        selectedIndex = index
-                                    }
-                                )
-                            }
-                        }
-
-                        else -> {}
                     }
+
+                    NoteType.VIDEO -> {
+                        itemsIndexed(noteData.videoPath ?: emptyList()) { _, item ->
+                            VideoItem(videoPath = item, onClick = { onVideoClick(item) })
+                        }
+                    }
+
+                    NoteType.AUDIO -> {
+                        itemsIndexed(noteData.audioPath ?: emptyList()) { index, content ->
+                            AudioPlayer(
+                                isAudioPlaying = isAudioPlaying && selectedIndex == index,
+                                duration = getAudioDuration(context, Uri.parse(content)),
+                                currentAudioPosition = if (selectedIndex == index)
+                                    currentAudioPos
+                                else 0,
+                                increaseCurrentAudioPosition = increaseCurrAudioPos,
+                                resetCurrentPosition = resetCurrAudioPos,
+                                onPlayButtonClicked = {
+                                    onPlayButtonClick(content)
+                                    selectedIndex = index
+                                }
+                            )
+                        }
+                    }
+
+                    else -> {}
                 }
             }
         }
@@ -209,22 +211,8 @@ private fun ImageItem(imagePath: String?, onClick: () -> Unit) {
 }
 
 @Composable
-private fun FullScreenImage(imagePath: String, onBackClick: () -> Unit) {
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .statusBarsPadding()
-                .zIndex(1f),
-            contentAlignment = Alignment.TopStart
-        ) {
-            IconButton(onClick = onBackClick) {
-                Icon(
-                    imageVector = Icons.Default.ArrowBackIosNew,
-                    contentDescription = null
-                )
-            }
-        }
+private fun FullScreenImage(modifier: Modifier = Modifier, imagePath: String) {
+    Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         MNZoomableImage(
             modifier = Modifier.fillMaxSize(),
             imagePath = imagePath,
@@ -261,7 +249,6 @@ private fun VideoItem(videoPath: String?, onClick: () -> Unit) {
 @Preview
 private fun PreviewNoteScreenContent() {
     NoteScreenContent(
-        onNavigateBack = {},
         noteData = Note(
             noteType = NoteType.TEXT.ordinal,
             title = "note title",
