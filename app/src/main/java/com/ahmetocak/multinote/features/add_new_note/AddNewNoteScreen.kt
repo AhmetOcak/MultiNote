@@ -86,7 +86,7 @@ import androidx.core.content.FileProvider
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
-import com.ahmetocak.multinote.R
+import com.ahmetocak.functionalnotes.R
 import com.ahmetocak.multinote.core.ui.components.MNTopBar
 import com.ahmetocak.multinote.core.ui.components.ProcessResultWarning
 import com.ahmetocak.multinote.features.add_new_note.components.MediaBottomSheet

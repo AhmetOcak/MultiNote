@@ -49,7 +49,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.ahmetocak.multinote.R
+import com.ahmetocak.functionalnotes.R
 import com.ahmetocak.multinote.core.ui.components.AudioPlayer
 import com.ahmetocak.multinote.core.ui.components.DeleteWarning
 import com.ahmetocak.multinote.core.ui.components.MNImage

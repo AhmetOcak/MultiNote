@@ -18,7 +18,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.ahmetocak.multinote.R
+import com.ahmetocak.functionalnotes.R
 import com.ahmetocak.multinote.core.ui.components.MNTopBar
 import com.ahmetocak.multinote.core.ui.theme.color_schemes.CustomColorScheme
 import com.ahmetocak.multinote.core.ui.theme.color_schemes.NeonColorScheme

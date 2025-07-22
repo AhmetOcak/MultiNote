@@ -16,7 +16,7 @@
     <uses-permission android:name="android.permission.READ_MEDIA_AUDIO"/>
 
     <application
-        android:name=".MainApplication"
+        android:name="com.ahmetocak.multinote.MainApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -27,7 +27,7 @@
         android:theme="@style/Theme.MultiNote"
         tools:targetApi="31">
         <activity
-            android:name=".features.MainActivity"
+            android:name="com.ahmetocak.multinote.features.MainActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.MultiNote">

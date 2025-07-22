@@ -10,7 +10,7 @@ import androidx.compose.material.icons.filled.StarRate
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ahmetocak.multinote.R
+import com.ahmetocak.functionalnotes.R
 import com.ahmetocak.multinote.data.repository.user_pref.UserPreferencesRepository
 import com.ahmetocak.multinote.model.ColorSchemeKeys
 import dagger.hilt.android.lifecycle.HiltViewModel
