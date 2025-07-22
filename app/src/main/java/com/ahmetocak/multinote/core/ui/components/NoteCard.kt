@@ -71,7 +71,7 @@ fun ImageNoteCard(title: String, description: String, imagePath: String?, onClic
             MNImage(
                 modifier = Modifier.fillMaxWidth().heightIn(max = getScreenHeight() / 3.5f),
                 imagePath = imagePath,
-                contentScale = ContentScale.Fit
+                contentScale = ContentScale.Crop
             )
             NoteTitle(title)
             Text(
@@ -133,7 +133,7 @@ fun VideoNoteCard(title: String, description: String, videoPath: String?, onClic
                             modifier = Modifier.fillMaxWidth(),
                             bitmap = it1,
                             contentDescription = null,
-                            contentScale = ContentScale.Fit
+                            contentScale = ContentScale.Crop
                         )
                     }
                 }

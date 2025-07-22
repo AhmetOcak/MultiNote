@@ -18,7 +18,6 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Archive
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Menu
@@ -308,6 +307,7 @@ private fun MenuSection(
                     },
                     onClick = onEdit
                 )
+                /*
                 DropdownMenuItem(
                     text = { Text(text = stringResource(R.string.archive)) },
                     leadingIcon = {
@@ -315,6 +315,7 @@ private fun MenuSection(
                     },
                     onClick = onArchive
                 )
+                 */
                 HorizontalDivider()
                 DropdownMenuItem(
                     text = {

@@ -4,7 +4,6 @@ import android.Manifest
 import android.content.Context
 import android.net.Uri
 import android.os.Build
-import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -24,6 +23,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
@@ -138,7 +138,6 @@ fun AddNewNoteScreen(
 
     val imagePickerLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri: Uri? ->
-            Log.d("MultiNote App: picked image path -> ", uri?.path ?: "null")
             coroutineScope.launch {
                 sheetState.hide()
                 uri?.let {
@@ -148,8 +147,7 @@ fun AddNewNoteScreen(
         }
 
     val takePictureLauncher =
-        rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { success ->
-            Log.d("MultiNote App: Photo taken, result -> ", "$success")
+        rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { _ ->
             coroutineScope.launch {
                 sheetState.hide()
                 createdMediaFile?.let {
@@ -160,8 +158,7 @@ fun AddNewNoteScreen(
         }
 
     val captureVideoLauncher =
-        rememberLauncherForActivityResult(ActivityResultContracts.CaptureVideo()) { success ->
-            Log.d("MultiNote App: Photo taken, result -> ", "$success")
+        rememberLauncherForActivityResult(ActivityResultContracts.CaptureVideo()) { _ ->
             coroutineScope.launch {
                 sheetState.hide()
                 createdMediaFile?.let { viewModel.handleAction1Click(it) }
@@ -172,7 +169,6 @@ fun AddNewNoteScreen(
     val audioPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
-        Log.d("MultiNote App: Audio file taken, result -> ", uri?.path ?: "null")
         coroutineScope.launch {
             sheetState.hide()
             uri?.let { viewModel.handleAction1Click(it) }
@@ -426,6 +422,8 @@ private fun AddNewNoteScreenContent(
                     Text(text = if (noteStatus == NoteStatus.CREATE) "Save" else "Update")
                 }
             }
+
+            Spacer(modifier = Modifier.imePadding())
 
             if (sheetState.currentValue == SheetValue.PartiallyExpanded || sheetState.currentValue == SheetValue.Expanded) {
                 when (selectedNoteType) {

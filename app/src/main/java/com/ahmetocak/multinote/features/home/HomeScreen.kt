@@ -12,9 +12,12 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
@@ -36,6 +39,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -68,16 +72,18 @@ fun HomeScreen(
     val onEvent by rememberUpdatedState(
         newValue = { event: HomeScreenUiEvent -> viewModel.onEvent(event) }
     )
+    val listState = rememberLazyStaggeredGridState()
 
     HomeScreenContent(
         modifier = modifier,
         searchQuery = viewModel.searchQuery,
         noteList = uiState.noteList,
+        listState = listState,
         onCreateNoteClick = onCreateNoteClick,
         onSettingsClick = onSettingsClick,
         homeScreenState = uiState.screenState,
         onCardClick = onCardClick,
-        onEvent = { onEvent(it) }
+        onEvent = remember { { onEvent(it) } }
     )
 
     if (uiState.showFilterSheet) {
@@ -90,14 +96,13 @@ fun HomeScreenContent(
     modifier: Modifier = Modifier,
     searchQuery: String,
     noteList: List<Note>,
+    listState: LazyStaggeredGridState,
     onCreateNoteClick: () -> Unit,
     onSettingsClick: () -> Unit,
     homeScreenState: HomeScreenState,
     onCardClick: (Int) -> Unit,
     onEvent: (HomeScreenUiEvent) -> Unit
 ) {
-    val listState = rememberLazyStaggeredGridState()
-
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
@@ -105,7 +110,7 @@ fun HomeScreenContent(
                 title = "MultiNote",
                 actions = {
                     if (homeScreenState is HomeScreenState.Idle) {
-                        androidx.compose.animation.AnimatedVisibility(visible = true) {
+                        AnimatedVisibility(visible = true) {
                             IconButton(onClick = onSettingsClick) {
                                 Icon(imageVector = Icons.Default.Settings, contentDescription = null)
                             }
@@ -153,9 +158,9 @@ fun HomeScreenContent(
                 ) {
                     SearchField(
                         value = searchQuery,
-                        onSearch = { onEvent(HomeScreenUiEvent.OnSearchClick) },
-                        onFilterClick = { onEvent(HomeScreenUiEvent.OnShowFilterSheetClick) },
-                        onValueChange = { onEvent(HomeScreenUiEvent.OnQueryEntering(it)) }
+                        onSearch = remember { { onEvent(HomeScreenUiEvent.OnSearchClick) } },
+                        onFilterClick = remember { { onEvent(HomeScreenUiEvent.OnShowFilterSheetClick) } },
+                        onValueChange = remember { { onEvent(HomeScreenUiEvent.OnQueryEntering(it)) } }
                     )
                     AnimatedVisibility(visible = noteList.isNotEmpty()) {
                         LazyVerticalStaggeredGrid(
@@ -237,7 +242,7 @@ fun HomeScreenContent(
 @Composable
 private fun FilterSheet(filterList: List<Int>, onEvent: (HomeScreenUiEvent) -> Unit) {
     ModalBottomSheet(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxSize().navigationBarsPadding().statusBarsPadding(),
         onDismissRequest = { onEvent(HomeScreenUiEvent.OnCloseFilterSheetClick) },
     ) {
         Column(
@@ -289,6 +294,7 @@ private fun FilterItem(
 private fun PreviewHomeScreenWithEmpty() {
     HomeScreenContent(
         searchQuery = "",
+        listState = rememberLazyStaggeredGridState(),
         noteList = emptyList(),
         onSettingsClick = {},
         homeScreenState = HomeScreenState.Idle,
@@ -344,6 +350,7 @@ private fun PreviewHomeScreen() {
                 videoPath = null
             )
         ),
+        listState = rememberLazyStaggeredGridState(),
         onSettingsClick = {},
         onCreateNoteClick = {},
         homeScreenState = HomeScreenState.Idle,
