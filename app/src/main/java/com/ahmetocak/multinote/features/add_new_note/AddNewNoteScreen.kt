@@ -297,6 +297,7 @@ private fun AddNewNoteScreenContent(
                 .fillMaxSize()
                 .padding(innerPadding)
                 .padding(horizontal = 16.dp)
+                .imePadding()
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
@@ -422,8 +423,6 @@ private fun AddNewNoteScreenContent(
                     Text(text = if (noteStatus == NoteStatus.CREATE) "Save" else "Update")
                 }
             }
-
-            Spacer(modifier = Modifier.imePadding())
 
             if (sheetState.currentValue == SheetValue.PartiallyExpanded || sheetState.currentValue == SheetValue.Expanded) {
                 when (selectedNoteType) {
