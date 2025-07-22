@@ -16,10 +16,12 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import com.ahmetocak.multinote.R
 
 @Composable
 fun SearchField(
@@ -43,7 +45,7 @@ fun SearchField(
             }
         },
         placeholder = {
-            Text(text = "Search a note", fontStyle = FontStyle.Italic)
+            Text(text = stringResource(R.string.search_note), fontStyle = FontStyle.Italic)
         },
         maxLines = 1,
         singleLine = true,

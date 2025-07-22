@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">FunctionalNotes</string>
+    <string name="settings">Настройки</string>
+    <string name="dark_theme">Темная тема</string>
+    <string name="color_themes">Темы</string>
+    <string name="dynamic_color">Динамический цвет</string>
+    <string name="rate_app">Оценить приложение</string>
+    <string name="share_app">Поделиться приложением</string>
+    <string name="themes">Темы</string>
+    <string name="edit">Редактировать</string>
+    <string name="archive">Архивировать</string>
+    <string name="delete">Удалить</string>
+    <string name="cancel">Отмена</string>
+    <string name="delete_warning">Вы уверены, что хотите удалить? Это действие нельзя отменить.</string>
+    <string name="delete_note">Удалить заметку</string>
+    <string name="search_note">Найти заметку</string>
+    <string name="recording">запись</string>
+    <string name="create_note">Создать заметку</string>
+    <string name="update_note">Обновить заметку</string>
+    <string name="save_note_successful">Заметка успешно сохранена</string>
+    <string name="note_title">Заголовок заметки</string>
+    <string name="note_description">Описание заметки</string>
+    <string name="click_for_the_image">Нажмите, чтобы добавить изображение</string>
+    <string name="click_for_the_audio">Нажмите, чтобы добавить аудио</string>
+    <string name="click_for_the_video">Нажмите, чтобы добавить видео</string>
+    <string name="save">Сохранить</string>
+    <string name="update">Обновить</string>
+    <string name="from_gallery">Из галереи</string>
+    <string name="capture_photo">Сделать фото</string>
+    <string name="from_device">Из устройства</string>
+    <string name="record_audio">Записать аудио</string>
+    <string name="record_video">Записать видео</string>
+    <string name="note_type">Тип заметки</string>
+    <string name="note_tag">Тег заметки</string>
+    <string name="there_is_no_notes">Заметок нет…</string>
+    <string name="filter_the_note_list">Фильтровать список заметок</string>
+    <string name="cancel_first_char_uppercase">Отмена</string>
+    <string name="filter">Фильтр</string>
+    <string name="media">Медиа</string>
+</resources>

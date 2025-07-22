@@ -30,14 +30,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.ahmetocak.multinote.R
 import com.ahmetocak.multinote.utils.getScreenHeight
 import com.ahmetocak.multinote.utils.getVideoThumbnail
 
 const val dummyDescription =
     "Lorem Ipsum is simply dummy text of the printing and typesetting industry. " +
             "Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
-val dummyImgId = R.drawable.test
 private const val MAX_LINE = 12
 
 @Composable

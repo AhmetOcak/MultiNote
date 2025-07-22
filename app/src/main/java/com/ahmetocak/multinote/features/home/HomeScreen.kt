@@ -43,11 +43,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.ahmetocak.multinote.R
 import com.ahmetocak.multinote.core.ui.components.AudioNoteCard
 import com.ahmetocak.multinote.core.ui.components.ImageNoteCard
 import com.ahmetocak.multinote.core.ui.components.MNTopBar
@@ -107,7 +109,7 @@ fun HomeScreenContent(
         modifier = modifier.fillMaxSize(),
         topBar = {
             MNTopBar(
-                title = "MultiNote",
+                title = stringResource(R.string.app_name),
                 actions = {
                     if (homeScreenState is HomeScreenState.Idle) {
                         AnimatedVisibility(visible = true) {
@@ -229,7 +231,7 @@ fun HomeScreenContent(
                                 contentDescription = null
                             )
                             Spacer(modifier = Modifier.height(16.dp))
-                            Text(text = "There is no notes...")
+                            Text(text = stringResource(R.string.there_is_no_notes))
                         }
                     }
                 }
@@ -250,7 +252,7 @@ private fun FilterSheet(filterList: List<Int>, onEvent: (HomeScreenUiEvent) -> U
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Text(
-                text = "Filter the note list",
+                text = stringResource(R.string.filter_the_note_list),
                 style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold)
             )
             NoteTag.entries.toTypedArray().forEach { tag ->
@@ -262,11 +264,11 @@ private fun FilterSheet(filterList: List<Int>, onEvent: (HomeScreenUiEvent) -> U
             }
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
                 FilledTonalButton(onClick = { onEvent(HomeScreenUiEvent.OnCloseFilterSheetClick) }) {
-                    Text(text = "Cancel")
+                    Text(text = stringResource(R.string.cancel_first_char_uppercase))
                 }
                 Spacer(modifier = Modifier.width(8.dp))
                 FilledTonalButton(onClick = { onEvent(HomeScreenUiEvent.OnSubmitFilterClick) }) {
-                    Text(text = "Filter")
+                    Text(text = stringResource(R.string.filter))
                 }
             }
         }

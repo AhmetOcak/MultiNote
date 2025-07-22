@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">FunctionalNotes</string>
+    <string name="settings">Ayarlar</string>
+    <string name="dark_theme">Karanlık Tema</string>
+    <string name="color_themes">Temalar</string>
+    <string name="dynamic_color">Dinamik Renk</string>
+    <string name="rate_app">Uygulamayı Değerlendir</string>
+    <string name="share_app">Uygulamayı Paylaş</string>
+    <string name="themes">Temalar</string>
+    <string name="edit">Düzenle</string>
+    <string name="archive">Arşivle</string>
+    <string name="delete">Sil</string>
+    <string name="cancel">İptal</string>
+    <string name="delete_warning">Silmek istediğinize emin misiniz? Bu işlem geri alınamaz.</string>
+    <string name="delete_note">Notu Sil</string>
+    <string name="search_note">Not ara</string>
+    <string name="recording">kaydediliyor</string>
+    <string name="create_note">Not Oluştur</string>
+    <string name="update_note">Notu Güncelle</string>
+    <string name="save_note_successful">Not başarıyla kaydedildi</string>
+    <string name="note_title">Not Başlığı</string>
+    <string name="note_description">Not Açıklaması</string>
+    <string name="click_for_the_image">Görüntü eklemek için tıklayın</string>
+    <string name="click_for_the_audio">Ses eklemek için tıklayın</string>
+    <string name="click_for_the_video">Video eklemek için tıklayın</string>
+    <string name="save">Kaydet</string>
+    <string name="update">Güncelle</string>
+    <string name="from_gallery">Galeriden</string>
+    <string name="capture_photo">Fotoğraf Çek</string>
+    <string name="from_device">Cihazdan</string>
+    <string name="record_audio">Ses Kaydet</string>
+    <string name="record_video">Video Kaydet</string>
+    <string name="note_type">Not Türü</string>
+    <string name="note_tag">Not Etiketi</string>
+    <string name="there_is_no_notes">Hiç not yok…</string>
+    <string name="filter_the_note_list">Not listesini filtrele</string>
+    <string name="cancel_first_char_uppercase">İptal</string>
+    <string name="filter">Filtre</string>
+    <string name="media">Medya</string>
+</resources>

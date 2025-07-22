@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">FunctionalNotes</string>
+    <string name="settings">Ajustes</string>
+    <string name="dark_theme">Tema oscuro</string>
+    <string name="color_themes">Temas</string>
+    <string name="dynamic_color">Color dinámico</string>
+    <string name="rate_app">Calificar la aplicación</string>
+    <string name="share_app">Compartir aplicación</string>
+    <string name="themes">Temas</string>
+    <string name="edit">Editar</string>
+    <string name="archive">Archivar</string>
+    <string name="delete">Eliminar</string>
+    <string name="cancel">Cancelar</string>
+    <string name="delete_warning">¿Está seguro de que desea eliminarlo? Esta acción no se puede deshacer.</string>
+    <string name="delete_note">Eliminar nota</string>
+    <string name="search_note">Buscar una nota</string>
+    <string name="recording">grabando</string>
+    <string name="create_note">Crear nota</string>
+    <string name="update_note">Actualizar nota</string>
+    <string name="save_note_successful">Nota guardada exitosamente</string>
+    <string name="note_title">Título de la nota</string>
+    <string name="note_description">Descripción de la nota</string>
+    <string name="click_for_the_image">Haga clic para agregar imagen</string>
+    <string name="click_for_the_audio">Haga clic para agregar audio</string>
+    <string name="click_for_the_video">Haga clic para agregar video</string>
+    <string name="save">Guardar</string>
+    <string name="update">Actualizar</string>
+    <string name="from_gallery">Desde la galería</string>
+    <string name="capture_photo">Tomar foto</string>
+    <string name="from_device">Desde el dispositivo</string>
+    <string name="record_audio">Grabar audio</string>
+    <string name="record_video">Grabar video</string>
+    <string name="note_type">Tipo de nota</string>
+    <string name="note_tag">Etiqueta de nota</string>
+    <string name="there_is_no_notes">No hay notas…</string>
+    <string name="filter_the_note_list">Filtrar lista de notas</string>
+    <string name="cancel_first_char_uppercase">Cancelar</string>
+    <string name="filter">Filtrar</string>
+    <string name="media">Medios</string>
+</resources>

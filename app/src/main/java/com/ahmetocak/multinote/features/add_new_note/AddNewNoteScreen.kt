@@ -76,6 +76,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -85,6 +86,7 @@ import androidx.core.content.FileProvider
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
+import com.ahmetocak.multinote.R
 import com.ahmetocak.multinote.core.ui.components.MNTopBar
 import com.ahmetocak.multinote.core.ui.components.ProcessResultWarning
 import com.ahmetocak.multinote.features.add_new_note.components.MediaBottomSheet
@@ -180,7 +182,7 @@ fun AddNewNoteScreen(
     )
 
     ProcessResultWarning(
-        message = "Not başarılı bir şekilde kaydedildi",
+        message = stringResource(R.string.save_note_successful),
         visible = uiState.showSaveNoteSuccessMessage
     )
 
@@ -287,7 +289,9 @@ private fun AddNewNoteScreenContent(
         modifier = modifier.fillMaxSize(),
         topBar = {
             MNTopBar(
-                title = if (noteStatus == NoteStatus.CREATE) "Create Note" else "Update Note",
+                title = if (noteStatus == NoteStatus.CREATE) stringResource(R.string.create_note) else stringResource(
+                    R.string.update_note
+                ),
                 onNavigateBack = onNavigateUpClick
             )
         }
@@ -316,7 +320,7 @@ private fun AddNewNoteScreenContent(
 
             NoteFoundations(
                 value = titleValue,
-                labelText = "Note Title",
+                labelText = stringResource(R.string.note_title),
                 singleLine = true,
                 onValueChange = {
                     onEvent(AddNewNoteUiEvent.OnTitleValueChange(it))
@@ -324,7 +328,7 @@ private fun AddNewNoteScreenContent(
             )
             NoteFoundations(
                 value = descriptionValue,
-                labelText = "Note Description",
+                labelText = stringResource(R.string.note_description),
                 onValueChange = {
                     onEvent(AddNewNoteUiEvent.OnDescriptionValueChange(it))
                 }
@@ -335,7 +339,7 @@ private fun AddNewNoteScreenContent(
                     when (it) {
                         emptyList<Uri>() -> {
                             AddMediaContent(
-                                text = "Click for the add Image",
+                                text = stringResource(R.string.click_for_the_image),
                                 icon = Icons.Default.Image,
                                 onClick = onAddMediaClick
                             )
@@ -361,7 +365,7 @@ private fun AddNewNoteScreenContent(
                     when (it) {
                         emptyList<Uri>() -> {
                             AddMediaContent(
-                                text = "Click for the add audio",
+                                text = stringResource(R.string.click_for_the_audio),
                                 icon = Icons.Default.AudioFile,
                                 onClick = onAddMediaClick
                             )
@@ -387,7 +391,7 @@ private fun AddNewNoteScreenContent(
                     when (it) {
                         emptyList<Uri>() -> {
                             AddMediaContent(
-                                text = "Click for the add video",
+                                text = stringResource(R.string.click_for_the_video),
                                 icon = Icons.Default.VideoFile,
                                 onClick = onAddMediaClick
                             )
@@ -420,7 +424,11 @@ private fun AddNewNoteScreenContent(
                             )
                         )
                     }) {
-                    Text(text = if (noteStatus == NoteStatus.CREATE) "Save" else "Update")
+                    Text(
+                        text = if (noteStatus == NoteStatus.CREATE) stringResource(R.string.save) else stringResource(
+                            R.string.update
+                        )
+                    )
                 }
             }
 
@@ -430,8 +438,8 @@ private fun AddNewNoteScreenContent(
                         MediaBottomSheet(
                             action1Image = Icons.Default.Image,
                             action2Image = Icons.Default.CameraAlt,
-                            action1Text = "From Gallery",
-                            action2Text = "Capture Photo",
+                            action1Text = stringResource(R.string.from_gallery),
+                            action2Text = stringResource(R.string.capture_photo),
                             sheetState = sheetState,
                             action1OnClick = action1Click,
                             action2OnClick = action2Click
@@ -442,8 +450,8 @@ private fun AddNewNoteScreenContent(
                         MediaBottomSheet(
                             action1Image = Icons.Default.AudioFile,
                             action2Image = Icons.Default.Mic,
-                            action1Text = "From Device",
-                            action2Text = "Record Audio",
+                            action1Text = stringResource(R.string.from_device),
+                            action2Text = stringResource(R.string.record_audio),
                             sheetState = sheetState,
                             isAudioRecording = isAudioRecording,
                             onSaveAudioClick = { onEvent(AddNewNoteUiEvent.OnRecordAudioClick) },
@@ -456,8 +464,8 @@ private fun AddNewNoteScreenContent(
                         MediaBottomSheet(
                             action1Image = Icons.Default.VideoFile,
                             action2Image = Icons.Default.Videocam,
-                            action1Text = "From Gallery",
-                            action2Text = "Record Video",
+                            action1Text = stringResource(R.string.from_gallery),
+                            action2Text = stringResource(R.string.record_video),
                             sheetState = sheetState,
                             action1OnClick = action1Click,
                             action2OnClick = action2Click
@@ -476,7 +484,7 @@ private fun SelectNoteType(selectedNoteType: NoteType, onClick: (NoteType) -> Un
     val context = LocalContext.current
 
     Column(modifier = Modifier.selectableGroup()) {
-        Text(text = "Note Type", style = MaterialTheme.typography.labelLarge)
+        Text(text = stringResource(R.string.note_type), style = MaterialTheme.typography.labelLarge)
         NoteType.entries.forEach { type ->
             Row(
                 modifier = Modifier
@@ -511,7 +519,7 @@ private fun SelectNoteTag(selectedNoteTag: NoteTag, onClick: (NoteTag) -> Unit) 
     val context = LocalContext.current
 
     Column(modifier = Modifier.selectableGroup()) {
-        Text(text = "Note Tag", style = MaterialTheme.typography.labelLarge)
+        Text(text = stringResource(R.string.note_tag), style = MaterialTheme.typography.labelLarge)
         NoteTag.entries.forEach { type ->
             Row(
                 modifier = Modifier

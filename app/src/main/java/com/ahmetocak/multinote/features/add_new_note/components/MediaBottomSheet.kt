@@ -40,9 +40,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.ahmetocak.multinote.R
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -80,7 +82,7 @@ fun MediaBottomSheet(
                     }
                 }
             ) {
-                Text(text = "cancel")
+                Text(text = stringResource(R.string.cancel))
             }
         }
         Crossfade(targetState = isAudioRecording) {
@@ -108,7 +110,7 @@ fun MediaBottomSheet(
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         modifier = Modifier.fillMaxWidth(),
-                        text = "recording",
+                        text = stringResource(R.string.recording),
                         style = MaterialTheme.typography.bodyLarge,
                         color = animatedColor,
                         textAlign = TextAlign.Center

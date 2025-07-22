@@ -178,7 +178,7 @@ private fun NoteScreenContent(
         if (!noteData.imagePath.isNullOrEmpty() || !noteData.audioPath.isNullOrEmpty() || !noteData.videoPath.isNullOrEmpty()) {
             Text(
                 modifier = Modifier.padding(horizontal = 16.dp),
-                text = "Media",
+                text = stringResource(R.string.media),
                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
             )
             LazyColumn(

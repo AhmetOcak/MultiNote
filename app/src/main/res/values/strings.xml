@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">MultiNote</string>
+    <string name="app_name">FunctionalNotes</string>
 
     <string name="settings">Settings</string>
     <string name="dark_theme">Dark Theme</string>
@@ -14,4 +14,28 @@
     <string name="cancel">Cancel</string>
     <string name="delete_warning">Are you sure you want to delete? This action cannot be undone.</string>
     <string name="delete_note">Delete Note</string>
+    <string name="search_note">Search a note</string>
+    <string name="recording">recording</string>
+    <string name="create_note">Create Note</string>
+    <string name="update_note">Update Note</string>
+    <string name="save_note_successful">Note successfully saved</string>
+    <string name="note_title">Note Title</string>
+    <string name="note_description">Note Description</string>
+    <string name="click_for_the_image">Click for the add Image</string>
+    <string name="click_for_the_audio">Click for the add audio</string>
+    <string name="click_for_the_video">Click for the add video</string>
+    <string name="save">Save</string>
+    <string name="update">Update</string>
+    <string name="from_gallery">From Gallery</string>
+    <string name="capture_photo">Capture Photo</string>
+    <string name="from_device">From Device</string>
+    <string name="record_audio">Record Audio</string>
+    <string name="record_video">Record Video</string>
+    <string name="note_type">Note Type</string>
+    <string name="note_tag">Note Tag</string>
+    <string name="there_is_no_notes">There is no notes…</string>
+    <string name="filter_the_note_list">Filter the note list</string>
+    <string name="cancel_first_char_uppercase">Cancel</string>
+    <string name="filter">Filter</string>
+    <string name="media">Media</string>
 </resources>
