@@ -7,11 +7,11 @@ plugins {
 }
 
 android {
-    namespace = "com.ahmetocak.functionalnotes"
+    namespace = "com.ahmetocak.multinotebook"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.ahmetocak.functionalnotes"
+        applicationId = "com.ahmetocak.multinotebook"
         minSdk = 26
         targetSdk = 35
         versionCode = 1

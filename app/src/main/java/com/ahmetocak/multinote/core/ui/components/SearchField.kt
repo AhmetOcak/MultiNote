@@ -21,7 +21,7 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import com.ahmetocak.functionalnotes.R
+import com.ahmetocak.multinotebook.R
 
 
 @Composable
